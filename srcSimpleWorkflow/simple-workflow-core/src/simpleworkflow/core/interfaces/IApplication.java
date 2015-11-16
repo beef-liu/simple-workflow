@@ -5,7 +5,7 @@ package simpleworkflow.core.interfaces;
  */
 public interface IApplication {
 
-    public void init(long workflowId);
+    public void init(String workflow_id);
 
     public void run();
 

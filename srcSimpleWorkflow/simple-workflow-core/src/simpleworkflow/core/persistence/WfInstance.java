@@ -3,10 +3,14 @@ package simpleworkflow.core.persistence;
 /**
  * @author XingGu_Liu
  */
-public class WorkflowInstance {
-    private String _id;
+public class WfInstance {
+    private String _workflow_id;
 
-    private String _name;
+    private String _workflow_name;
+
+    private int _workflow_status;
+
+    private String _current_state_id;
 
     /**
      * This workflow is a subflow if parent_flow_id is not 0;
@@ -20,26 +24,25 @@ public class WorkflowInstance {
      */
     private String _parent_flow_activity_name = null;
 
-    private int _workflow_status;
+    private long _update_time;
 
-    private String _current_state_id;
+    private long _create_time;
 
-    private long _creation_time;
 
-    public String getId() {
-        return _id;
+    public String getWorkflow_id() {
+        return _workflow_id;
     }
 
-    public void setId(String id) {
-        _id = id;
+    public void setWorkflow_id(String workflow_id) {
+        _workflow_id = workflow_id;
     }
 
-    public String getName() {
-        return _name;
+    public String getWorkflow_name() {
+        return _workflow_name;
     }
 
-    public void setName(String name) {
-        _name = name;
+    public void setWorkflow_name(String workflow_name) {
+        _workflow_name = workflow_name;
     }
 
     public String getParent_flow_id() {
@@ -82,11 +85,19 @@ public class WorkflowInstance {
         _current_state_id = current_state_id;
     }
 
-    public long getCreation_time() {
-        return _creation_time;
+    public long getUpdate_time() {
+        return _update_time;
     }
 
-    public void setCreation_time(long creation_time) {
-        _creation_time = creation_time;
+    public void setUpdate_time(long update_time) {
+        _update_time = update_time;
+    }
+
+    public long getCreate_time() {
+        return _create_time;
+    }
+
+    public void setCreate_time(long create_time) {
+        _create_time = create_time;
     }
 }
