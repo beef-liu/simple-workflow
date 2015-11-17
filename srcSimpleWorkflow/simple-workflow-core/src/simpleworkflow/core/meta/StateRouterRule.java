@@ -5,18 +5,22 @@ package simpleworkflow.core.meta;
  */
 public class StateRouterRule extends MetaBaseData {
 
-    private BoolCondition _boolCondition;
+    /**
+     * Application whose return value is boolean type
+     */
+    private Application _boolCondition;
 
     /**
      * the state where go to
      */
     private String _destination;
 
-    public BoolCondition getBoolCondition() {
+
+    public Application getBoolCondition() {
         return _boolCondition;
     }
 
-    public void setBoolCondition(BoolCondition boolCondition) {
+    public void setBoolCondition(Application boolCondition) {
         _boolCondition = boolCondition;
     }
 

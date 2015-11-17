@@ -7,11 +7,22 @@ import java.util.List;
  */
 public class Workflow extends MetaBaseData {
 
+    private long _version;
+
     private String _author;
 
     private List<State> _states;
 
     private String _startState = "";
+
+
+    public long getVersion() {
+        return _version;
+    }
+
+    public void setVersion(long version) {
+        _version = version;
+    }
 
     public String getAuthor() {
         return _author;
