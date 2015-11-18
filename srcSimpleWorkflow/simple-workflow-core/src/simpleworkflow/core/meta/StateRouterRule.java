@@ -6,7 +6,7 @@ package simpleworkflow.core.meta;
 public class StateRouterRule extends MetaBaseData {
 
     /**
-     * Application whose return value is boolean type
+     * IStateRouterRuleApp if application type is java
      */
     private Application _boolCondition;
 

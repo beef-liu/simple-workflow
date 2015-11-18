@@ -8,8 +8,6 @@ import simpleworkflow.core.meta.Application;
  */
 public interface IApplicationLoader {
 
-    public IApplication createApplication(Application appMeta) throws WorkflowException;
-
-    public Object executeApplication(Application appMeta, IApplication app) throws WorkflowException;
+    IApplication createApplication(Application appMeta) throws WorkflowException;
 
 }

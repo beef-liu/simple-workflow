@@ -8,7 +8,7 @@ public class Application extends MetaBaseData {
     /**
      * The format should be decided by the implementation of workflow engine.
      * It could simply be a block of code of java script,
-     * or could be some information for constructing IApplication, such like class name, method name, source file path, etc.
+     * or could be some information for constructing IXXXXApplication, such like class name, method name, source file path, etc.
      *
      */
     private String _run_scheme;

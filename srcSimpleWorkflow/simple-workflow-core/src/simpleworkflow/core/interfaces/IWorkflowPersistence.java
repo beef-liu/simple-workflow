@@ -6,6 +6,7 @@ import simpleworkflow.core.persistence.WorkflowPersistenceException;
 import simpleworkflow.core.persistence.data.WfInstance;
 import simpleworkflow.core.persistence.data.WfStateInstance;
 import simpleworkflow.core.persistence.data.WfTraceInstance;
+import simpleworkflow.core.persistence.data.WfTraceRecord;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  */
 public interface IWorkflowPersistence {
 
-    public void init(String configFilePath);
+    public void init(String configFilePath,
+                     IClassFinder classFinderForWorkflowCoreData, IClassFinder classFinderForStateData);
 
     public void destroy();
 
@@ -101,9 +103,9 @@ public interface IWorkflowPersistence {
 
         public void setWorkflowInstance(WfInstance data) throws WorkflowPersistenceException;
 
-
         public void setWorkflowTraceInstance(WfTraceInstance data) throws WorkflowPersistenceException;
 
+        public void addWorkflowTraceRecord(WfTraceRecord data) throws WorkflowPersistenceException;
 
         public void setStateInstance(WfStateInstance data) throws WorkflowPersistenceException;
 

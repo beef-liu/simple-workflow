@@ -9,14 +9,17 @@ public class State extends MetaBaseData {
 
     private int _stateType = 0;
 
+    /**
+     * IStateInitApp if application type is java
+     */
     private Activity _initActivity;
 
     private List<Transition> _transitions;
 
     /**
-     * Application whose return value is boolean type
+     * IStateAuthCheckApp if application type is java
      */
-    private Application _accessibleJudge;
+    private Application _accessibleCheck;
 
     public Activity getInitActivity() {
         return _initActivity;
@@ -42,11 +45,11 @@ public class State extends MetaBaseData {
         _transitions = transitions;
     }
 
-    public Application getAccessibleJudge() {
-        return _accessibleJudge;
+    public Application getAccessibleCheck() {
+        return _accessibleCheck;
     }
 
-    public void setAccessibleJudge(Application accessibleJudge) {
-        _accessibleJudge = accessibleJudge;
+    public void setAccessibleCheck(Application accessibleCheck) {
+        _accessibleCheck = accessibleCheck;
     }
 }

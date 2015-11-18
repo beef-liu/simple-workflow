@@ -9,6 +9,10 @@ public class Activity extends MetaBaseData {
 
     private String _subflowName;
 
+    /**
+     * Generally the return value of application is type of stateData.
+     * If it is invoked by triggered event, then the method will has one parameter which is from event.
+     */
     private Application _application;
 
     public boolean isSubflowFlag() {
