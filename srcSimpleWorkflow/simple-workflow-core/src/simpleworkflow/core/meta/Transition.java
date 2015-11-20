@@ -6,9 +6,6 @@ package simpleworkflow.core.meta;
 public class Transition extends MetaBaseData {
     private Event _event;
 
-    /**
-     * IStateTransitionApp if application type is java
-     */
     private Activity _activity;
 
     private StateRouter _stateRouter;

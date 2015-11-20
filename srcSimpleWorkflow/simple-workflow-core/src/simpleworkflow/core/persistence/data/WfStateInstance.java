@@ -22,14 +22,16 @@ public class WfStateInstance {
      */
     private String _out_state_data = null;
 
-    private String _triggered_event;
-
-    private String _triggered_activity;
+    private String _triggered_event = null;
+    private String _triggered_event_data = null;
+    private String _triggered_subflow_id = null;
 
     /**
      * next state name
      */
-    private String _destination;
+    private String _to_state_name = null;
+
+    private String _to_state_id = null;
 
     private String _create_user;
 
@@ -96,28 +98,36 @@ public class WfStateInstance {
         _triggered_event = triggered_event;
     }
 
-    public String getTriggered_activity() {
-        return _triggered_activity;
+    public String getTriggered_event_data() {
+        return _triggered_event_data;
     }
 
-    public void setTriggered_activity(String triggered_activity) {
-        _triggered_activity = triggered_activity;
+    public void setTriggered_event_data(String triggered_event_data) {
+        _triggered_event_data = triggered_event_data;
     }
 
-    public long getUpdate_time() {
-        return _update_time;
+    public String getTriggered_subflow_id() {
+        return _triggered_subflow_id;
     }
 
-    public void setUpdate_time(long update_time) {
-        _update_time = update_time;
+    public void setTriggered_subflow_id(String triggered_subflow_id) {
+        _triggered_subflow_id = triggered_subflow_id;
     }
 
-    public long getCreate_time() {
-        return _create_time;
+    public String getTo_state_name() {
+        return _to_state_name;
     }
 
-    public void setCreate_time(long create_time) {
-        _create_time = create_time;
+    public void setTo_state_name(String to_state_name) {
+        _to_state_name = to_state_name;
+    }
+
+    public String getTo_state_id() {
+        return _to_state_id;
+    }
+
+    public void setTo_state_id(String to_state_id) {
+        _to_state_id = to_state_id;
     }
 
     public String getCreate_user() {
@@ -134,5 +144,21 @@ public class WfStateInstance {
 
     public void setUpdate_user(String update_user) {
         _update_user = update_user;
+    }
+
+    public long getCreate_time() {
+        return _create_time;
+    }
+
+    public void setCreate_time(long create_time) {
+        _create_time = create_time;
+    }
+
+    public long getUpdate_time() {
+        return _update_time;
+    }
+
+    public void setUpdate_time(long update_time) {
+        _update_time = update_time;
     }
 }

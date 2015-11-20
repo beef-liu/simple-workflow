@@ -5,22 +5,27 @@ package simpleworkflow.core.meta;
  */
 public class Activity extends MetaBaseData {
 
-    private boolean _subflowFlag = false;
-
-    private String _subflowName;
-
     /**
-     * Generally the return value of application is type of stateData.
-     * If it is invoked by triggered event, then the method will has one parameter which is from event.
+     * It will be ignored when subflowFlag == true.
+     * Return value should be type of stateData
      */
     private Application _application;
 
-    public boolean isSubflowFlag() {
-        return _subflowFlag;
+    /**
+     * Current flow will go into a subflow after application being executed if subflow == true
+     */
+    private boolean _subflow = false;
+
+    private String _subflowName;
+
+
+
+    public boolean isSubflow() {
+        return _subflow;
     }
 
-    public void setSubflowFlag(boolean subflowFlag) {
-        _subflowFlag = subflowFlag;
+    public void setSubflow(boolean subflow) {
+        _subflow = subflow;
     }
 
     public String getSubflowName() {

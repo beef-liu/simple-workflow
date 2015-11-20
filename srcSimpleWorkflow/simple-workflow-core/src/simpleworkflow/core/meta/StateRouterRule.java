@@ -6,14 +6,14 @@ package simpleworkflow.core.meta;
 public class StateRouterRule extends MetaBaseData {
 
     /**
-     * IStateRouterRuleApp if application type is java
+     * Return value should be type of Boolean
      */
     private Application _boolCondition;
 
     /**
-     * the state where go to
+     * the state name where go to
      */
-    private String _destination;
+    private String _toState;
 
 
     public Application getBoolCondition() {
@@ -24,11 +24,11 @@ public class StateRouterRule extends MetaBaseData {
         _boolCondition = boolCondition;
     }
 
-    public String getDestination() {
-        return _destination;
+    public String getToState() {
+        return _toState;
     }
 
-    public void setDestination(String destination) {
-        _destination = destination;
+    public void setToState(String toState) {
+        _toState = toState;
     }
 }

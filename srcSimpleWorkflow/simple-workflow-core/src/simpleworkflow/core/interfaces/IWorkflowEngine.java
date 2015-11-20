@@ -12,10 +12,19 @@ import simpleworkflow.core.persistence.data.WfStateInstance;
  */
 public interface IWorkflowEngine {
 
+    /**
+     *
+     * @param workflowPersistence
+     * @param applicationLoader
+     * @param classFinderForWorkflowCoreData this classFinder should be capable to find class of all class under simpleworkflow.core
+     * @param classFinderForStateData this classFinder should be capable to find class of all stateData and applications and others which referenced by them.
+     */
     public void init(IWorkflowPersistence workflowPersistence, IApplicationLoader applicationLoader,
                      IClassFinder classFinderForWorkflowCoreData, IClassFinder classFinderForStateData);
 
     public void destroy();
+
+    public String getEngineName();
 
     public IWorkflowPersistence.IWorkflowQueryService getWorkflowQueryService();
 
@@ -27,29 +36,39 @@ public interface IWorkflowEngine {
      * @throws WorkflowException
      */
     public WfInstance createWorkflow(
-            String user, String workflowName,
-            Object stateData
+            String user, String workflowName, Object stateData
             ) throws WorkflowException;
 
     /**
-     * Create a workflow which is invoked from activity of parent flow
+     * Create a sub workflow which is invoked from activity of parent flow.
+     * If parentWorkflowId is null, then it is not a sub workflow just same as the method 'createWorkflow'.
      * @param user
      * @param workflowName
+     * @param stateData
      * @param parentWorkflowId
      * @param parentWorkflowStateId
-     * @param parentWorkflowStateEvent
+     * @param parentWorkflowEventName
      * @return
      * @throws WorkflowException
      */
-    public WfInstance createWorkflow(
-            String user, String workflowName,
-            Object stateData,
-            String parentWorkflowId, String parentWorkflowStateId,
-            String parentWorkflowStateEvent) throws WorkflowException;
+    public WfInstance createSubWorkflow(
+            String user, String workflowName, Object stateData,
+            String parentWorkflowId, String parentWorkflowStateId, String parentWorkflowEventName
+            ) throws WorkflowException;
 
+
+    /**
+     * Trigger an event of current state.
+     * @param user
+     * @param workflowId
+     * @param eventName
+     * @param eventData
+     * @return
+     * @throws WorkflowException
+     */
     public WfStateEventResult triggerStateEvent(
             String user, String workflowId,
-            String eventName
+            String eventName, Object eventData
     ) throws WorkflowException;
 
     public void updateMetaWorkflow(Workflow data) throws WorkflowException;

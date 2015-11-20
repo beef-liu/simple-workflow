@@ -7,7 +7,12 @@ import simpleworkflow.core.WorkflowException;
  */
 public class WorkflowPersistenceException extends WorkflowException {
 
-    public WorkflowPersistenceException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6974935464705100305L;
+
+	public WorkflowPersistenceException() {
         super();
     }
 

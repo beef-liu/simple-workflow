@@ -34,25 +34,25 @@ public class WorkFlowUtil {
         return false;
     }
 
-    public static Activity getActivityByEvent(State stateMeta, String eventName) {
+    public static Transition getTransitionByEvent(State stateMeta, String eventName) {
         for (Transition transition: stateMeta.getTransitions()) {
             if(transition.getEvent().getName().equals(eventName)) {
-                return transition.getActivity();
+                return transition;
             }
         }
 
         return null;
     }
 
-    public static Activity getActivityByActivityName(State stateMeta, String activityName) {
-        for (Transition transition: stateMeta.getTransitions()) {
-            if(transition.getActivity().getName().equals(activityName)) {
-                return transition.getActivity();
-            }
-        }
-
-        return null;
-    }
+//    public static Activity getActivityByActivityName(State stateMeta, String activityName) {
+//        for (Transition transition: stateMeta.getTransitions()) {
+//            if(transition.getActivity().getName().equals(activityName)) {
+//                return transition.getActivity();
+//            }
+//        }
+//
+//        return null;
+//    }
 
 
 }

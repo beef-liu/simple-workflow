@@ -10,24 +10,18 @@ public class State extends MetaBaseData {
     private int _stateType = 0;
 
     /**
-     * IStateInitApp if application type is java
+     * This application will be executed before create state instance.
+     * Return value should be type of stateData
      */
-    private Activity _initActivity;
+    private Application _initApp;
 
     private List<Transition> _transitions;
 
     /**
-     * IStateAuthCheckApp if application type is java
+     * Return value should be type of Boolean
      */
     private Application _accessibleCheck;
 
-    public Activity getInitActivity() {
-        return _initActivity;
-    }
-
-    public void setInitActivity(Activity initActivity) {
-        _initActivity = initActivity;
-    }
 
     public int getStateType() {
         return _stateType;
@@ -35,6 +29,14 @@ public class State extends MetaBaseData {
 
     public void setStateType(int stateType) {
         _stateType = stateType;
+    }
+
+    public Application getInitApp() {
+        return _initApp;
+    }
+
+    public void setInitApp(Application initApp) {
+        _initApp = initApp;
     }
 
     public List<Transition> getTransitions() {

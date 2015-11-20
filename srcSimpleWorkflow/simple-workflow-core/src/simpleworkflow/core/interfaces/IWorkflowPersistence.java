@@ -20,6 +20,8 @@ public interface IWorkflowPersistence {
 
     public void destroy();
 
+    public IPersistenceTransaction createTransaction();
+
     public IWorkflowQueryService getWorkflowQueryService();
 
     public IWorkflowModifyService getWorkflowModifyService();
@@ -99,19 +101,19 @@ public interface IWorkflowPersistence {
     }
 
     public static interface IWorkflowModifyService {
-        public void setMetaWorkflow(Workflow data) throws WorkflowPersistenceException;
+        public void setMetaWorkflow(IPersistenceTransaction trans, Workflow data) throws WorkflowPersistenceException;
 
-        public void setWorkflowInstance(WfInstance data) throws WorkflowPersistenceException;
+        public void setWorkflowInstance(IPersistenceTransaction trans, WfInstance data) throws WorkflowPersistenceException;
 
-        public void setWorkflowTraceInstance(WfTraceInstance data) throws WorkflowPersistenceException;
+        public void setWorkflowTraceInstance(IPersistenceTransaction trans, WfTraceInstance data) throws WorkflowPersistenceException;
 
-        public void addWorkflowTraceRecord(WfTraceRecord data) throws WorkflowPersistenceException;
+        public void addWorkflowTraceRecord(IPersistenceTransaction trans, WfTraceRecord data) throws WorkflowPersistenceException;
 
-        public void setStateInstance(WfStateInstance data) throws WorkflowPersistenceException;
+        public void setStateInstance(IPersistenceTransaction trans, WfStateInstance data) throws WorkflowPersistenceException;
 
-        public void setCurrentStateInstance(WfStateInstance data) throws WorkflowPersistenceException;
+        public void setCurrentStateInstance(IPersistenceTransaction trans, WfStateInstance data) throws WorkflowPersistenceException;
 
-        public void setCurrentState(String stateId) throws WorkflowPersistenceException;
+        public void setCurrentState(IPersistenceTransaction trans, String stateId) throws WorkflowPersistenceException;
     }
 
 }

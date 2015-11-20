@@ -8,7 +8,7 @@ public class WfTraceRecord {
 
     private long _trace_seq;
 
-    private String _parent_workflow_id;
+    private String _parent_workflow_id = null;
 
     private String _state_id;
 

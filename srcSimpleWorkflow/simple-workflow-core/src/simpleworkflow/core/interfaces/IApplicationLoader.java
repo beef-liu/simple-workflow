@@ -8,6 +8,13 @@ import simpleworkflow.core.meta.Application;
  */
 public interface IApplicationLoader {
 
-    IApplication createApplication(Application appMeta) throws WorkflowException;
+    /**
+     * appMeta and appParam are interpreted by workflow engine.
+     * @param appMeta
+     * @param appParams
+     * @return stateData or Boolean
+     * @throws WorkflowException
+     */
+    Object executeApplication(Application appMeta, Object appParams) throws WorkflowException;
 
 }

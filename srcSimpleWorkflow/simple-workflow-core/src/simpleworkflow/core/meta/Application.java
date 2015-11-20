@@ -6,10 +6,9 @@ package simpleworkflow.core.meta;
 public class Application extends MetaBaseData {
 
     /**
-     * The format should be decided by the implementation of workflow engine.
-     * It could simply be a block of code of java script,
-     * or could be some information for constructing IXXXXApplication, such like class name, method name, source file path, etc.
-     *
+     * It could simply be a block of code of java script, or a java class.
+     * Details about how functions is interpreted by workflow engine.
+     * Generally the return value is type of Boolean or type of stateData.
      */
     private String _run_scheme;
 

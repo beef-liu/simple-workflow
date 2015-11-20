@@ -12,6 +12,7 @@ public class WfInstance {
 
     private int _workflow_status;
 
+    private String _current_state_name;
     private String _current_state_id;
 
     /**
@@ -95,6 +96,14 @@ public class WfInstance {
 
     public void setCurrent_state_id(String current_state_id) {
         _current_state_id = current_state_id;
+    }
+
+    public String getCurrent_state_name() {
+        return _current_state_name;
+    }
+
+    public void setCurrent_state_name(String current_state_name) {
+        _current_state_name = current_state_name;
     }
 
     public long getUpdate_time() {

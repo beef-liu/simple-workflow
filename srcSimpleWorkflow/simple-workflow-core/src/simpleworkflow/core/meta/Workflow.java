@@ -11,6 +11,8 @@ public class Workflow extends MetaBaseData {
 
     private String _author;
 
+    private String _engineName;
+
     private List<State> _states;
 
     private String _startState = "";
@@ -30,6 +32,14 @@ public class Workflow extends MetaBaseData {
 
     public void setAuthor(String author) {
         _author = author;
+    }
+
+    public String getEngineName() {
+        return _engineName;
+    }
+
+    public void setEngineName(String engineName) {
+        _engineName = engineName;
     }
 
     public List<State> getStates() {

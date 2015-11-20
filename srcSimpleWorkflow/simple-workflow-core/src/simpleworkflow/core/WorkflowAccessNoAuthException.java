@@ -5,7 +5,12 @@ package simpleworkflow.core;
  */
 public class WorkflowAccessNoAuthException extends WorkflowException {
 
-    public WorkflowAccessNoAuthException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3550298100794691113L;
+
+	public WorkflowAccessNoAuthException() {
         super();
     }
 

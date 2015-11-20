@@ -5,7 +5,12 @@ package simpleworkflow.core;
  */
 public class WorkflowException extends Exception {
 
-    public WorkflowException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 440222858039086151L;
+
+	public WorkflowException() {
         super();
     }
 
