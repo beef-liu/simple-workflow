@@ -14,6 +14,7 @@ public class WfInstance {
 
     private String _current_state_name;
     private String _current_state_id;
+    private String _current_state_data;
 
     /**
      * This workflow is a subflow if parent_flow_id is not 0;
@@ -96,6 +97,14 @@ public class WfInstance {
 
     public void setCurrent_state_id(String current_state_id) {
         _current_state_id = current_state_id;
+    }
+
+    public String getCurrent_state_data() {
+        return _current_state_data;
+    }
+
+    public void setCurrent_state_data(String current_state_data) {
+        _current_state_data = current_state_data;
     }
 
     public String getCurrent_state_name() {

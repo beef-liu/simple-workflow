@@ -73,12 +73,13 @@ public interface IWorkflowEngine {
 
     public void updateMetaWorkflow(Workflow data) throws WorkflowException;
 
-    public State getMetaState(String workflowName, long workflowVersion, String stateName) throws WorkflowException;
+    /**
+     *
+     * @param workflowId
+     * @return
+     */
+    public Object getWorkflowCurrentStateData(String workflowId) throws WorkflowException;
 
-    public void updateState(WfStateInstance stateInstance) throws WorkflowException;
-
-    public Object getStateData(String stateId);
-
-    public void updateStateData(String stateId, Object stateData);
+    public void setWorkflowCurrentStateData(String workflowId, Object stateData) throws WorkflowException;
 
 }

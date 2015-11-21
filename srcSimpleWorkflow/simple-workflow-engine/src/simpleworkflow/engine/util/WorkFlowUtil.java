@@ -1,6 +1,5 @@
 package simpleworkflow.engine.util;
 
-import simpleworkflow.core.meta.Activity;
 import simpleworkflow.core.meta.State;
 import simpleworkflow.core.meta.Transition;
 import simpleworkflow.core.meta.Workflow;
@@ -8,7 +7,7 @@ import simpleworkflow.core.meta.Workflow;
 /**
  * @author XingGu_Liu
  */
-public class WorkFlowUtil {
+public class WorkflowUtil {
 
     public static State getMetaState(Workflow workFlowMeta, String stateName) {
         for (State data: workFlowMeta.getStates()) {

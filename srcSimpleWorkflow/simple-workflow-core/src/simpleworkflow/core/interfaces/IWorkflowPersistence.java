@@ -41,16 +41,34 @@ public interface IWorkflowPersistence {
 
         /**
          * Find Workflows sorted by version in descending
-         * @param name workflow name
+         * @param name name of workflow
          * @return
          * @throws WorkflowPersistenceException
          */
         public List<Workflow> findMetaWorkflows(String name) throws WorkflowPersistenceException;
 
+        /**
+         * get workflow instance by workflow id
+         * @param id id of workflow
+         * @return
+         * @throws WorkflowPersistenceException
+         */
         public WfInstance getWorkflowInstance(String id) throws WorkflowPersistenceException;
 
+        /**
+         * get workflow trace instance which contains all of trace records by workflow id
+         * @param id id of workflow
+         * @return
+         * @throws WorkflowPersistenceException
+         */
         public WfTraceInstance getWorkflowTraceInstance(String id) throws WorkflowPersistenceException;
 
+        /**
+         * get state instance by stateId
+         * @param stateId id of state instance
+         * @return
+         * @throws WorkflowPersistenceException
+         */
         public WfStateInstance getStateInstance(String stateId) throws WorkflowPersistenceException;
 
         public WfStateInstance getCurrentStateInstance(String workflowId) throws WorkflowPersistenceException;
@@ -101,19 +119,61 @@ public interface IWorkflowPersistence {
     }
 
     public static interface IWorkflowModifyService {
+        /**
+         * save workflow meta data
+         * @param trans
+         * @param data workflow meta data
+         * @throws WorkflowPersistenceException
+         */
         public void setMetaWorkflow(IPersistenceTransaction trans, Workflow data) throws WorkflowPersistenceException;
 
+        /**
+         * save workflow instance
+         * @param trans
+         * @param data workflow instance
+         * @throws WorkflowPersistenceException
+         */
         public void setWorkflowInstance(IPersistenceTransaction trans, WfInstance data) throws WorkflowPersistenceException;
 
+        /**
+         * save trace instance which contains all trace records
+         * @param trans
+         * @param data workflow trace instance
+         * @throws WorkflowPersistenceException
+         */
         public void setWorkflowTraceInstance(IPersistenceTransaction trans, WfTraceInstance data) throws WorkflowPersistenceException;
 
+        /**
+         * add a trace record
+         * @param trans
+         * @param data workflow trace record
+         * @throws WorkflowPersistenceException
+         */
         public void addWorkflowTraceRecord(IPersistenceTransaction trans, WfTraceRecord data) throws WorkflowPersistenceException;
 
+        /**
+         * Save state instance
+         * @param trans
+         * @param data state instance
+         * @throws WorkflowPersistenceException
+         */
         public void setStateInstance(IPersistenceTransaction trans, WfStateInstance data) throws WorkflowPersistenceException;
 
-        public void setCurrentStateInstance(IPersistenceTransaction trans, WfStateInstance data) throws WorkflowPersistenceException;
 
-        public void setCurrentState(IPersistenceTransaction trans, String stateId) throws WorkflowPersistenceException;
+        /**
+         * update current_state_name, current_state_id of workflow instance
+         * @param trans
+         * @param workflowId
+         * @param stateName
+         * @param stateId
+         * @throws WorkflowPersistenceException
+         */
+        public void setWorkflowCurrentState(
+                IPersistenceTransaction trans,
+                String workflowId,
+                String stateName,
+                String stateId, String stateDataXml
+                ) throws WorkflowPersistenceException;
     }
 
 }

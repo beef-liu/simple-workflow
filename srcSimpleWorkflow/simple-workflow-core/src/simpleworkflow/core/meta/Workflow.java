@@ -17,6 +17,10 @@ public class Workflow extends MetaBaseData {
 
     private String _startState = "";
 
+    /**
+     * Name of a Java Class
+     */
+    private String _stateDataType = "";
 
     public long getVersion() {
         return _version;
@@ -56,5 +60,13 @@ public class Workflow extends MetaBaseData {
 
     public void setStartState(String startState) {
         _startState = startState;
+    }
+
+    public String getStateDataType() {
+        return _stateDataType;
+    }
+
+    public void setStateDataType(String stateDataType) {
+        _stateDataType = stateDataType;
     }
 }

@@ -12,15 +12,11 @@ public class WfStateInstance {
 
     private String _state_name;
 
+
     /**
      * StateData value when workflow just go to this state
      */
     private String _in_state_data = null;
-
-    /**
-     * StateData value after executing activity
-     */
-    private String _out_state_data = null;
 
     private String _triggered_event = null;
     private String _triggered_event_data = null;
@@ -80,14 +76,6 @@ public class WfStateInstance {
 
     public void setIn_state_data(String in_state_data) {
         _in_state_data = in_state_data;
-    }
-
-    public String getOut_state_data() {
-        return _out_state_data;
-    }
-
-    public void setOut_state_data(String out_state_data) {
-        _out_state_data = out_state_data;
     }
 
     public String getTriggered_event() {
