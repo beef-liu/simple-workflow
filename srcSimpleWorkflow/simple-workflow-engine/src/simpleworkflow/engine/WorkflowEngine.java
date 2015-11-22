@@ -121,7 +121,10 @@ public class WorkflowEngine implements IWorkflowEngine {
             workflowInst.setWorkflow_version(newWorkflowVersion());
             workflowInst.setWorkflow_status(WorkflowEnums.WorkflowStatus.Running.ordinal());
             workflowInst.setCurrent_state_name(startStateName);
-            workflowInst.setCreate_time(System.currentTimeMillis());
+
+            long curTime = System.currentTimeMillis();
+            workflowInst.setCreate_time(curTime);
+            workflowInst.setUpdate_time(curTime);
 
             //parent flow
             if(!isEmpty(parentWorkflowId)) {
@@ -131,7 +134,7 @@ public class WorkflowEngine implements IWorkflowEngine {
             }
 
             //init state (create instance)
-            WfStateInstance stateInst = initStateInstance(
+            InitedStateInstance initedStateInst = initStateInstance(
                     user, workflowMeta, workflowInst.getWorkflow_id(),
                     startStateMeta, inData
                     );
@@ -140,7 +143,7 @@ public class WorkflowEngine implements IWorkflowEngine {
             IPersistenceTransaction trans = _workflowPersistence.createTransaction();
             try {
                 //===>save instance of workFlow and state
-                saveWorkflowStateOnFlowCreated(trans, workflowInst, stateInst);
+                saveWorkflowStateOnFlowCreated(trans, workflowInst, initedStateInst.stateInstance);
 
                 trans.commit();
             } catch (Throwable e) {
@@ -155,7 +158,7 @@ public class WorkflowEngine implements IWorkflowEngine {
                     + " workflowName:" + workflowName
                     + " workflowId:" + workflowInst.getWorkflow_id()
                     + " stateName:" + startStateName
-                    + " stateId:" + stateInst.getState_id()
+                    + " stateId:" + initedStateInst.stateInstance.getState_id()
             );
             return workflowInst;
         } catch(Throwable e) {
@@ -186,7 +189,8 @@ public class WorkflowEngine implements IWorkflowEngine {
                     .getMetaWorkflow(workflowInst.getWorkflow_name(), workflowInst.getWorkflow_version());
 
             //Get state meta
-            State currentStateMeta = WorkflowUtil.getMetaState(workflowMeta, currentStateInst.getState_name());
+            State currentStateMeta = WorkflowUtil.getMetaState(
+                    workflowMeta, currentStateInst.getState_name());
 
             //stateData
             Object stateData = _xmlSerForStateData.xmlToObj(
@@ -238,6 +242,7 @@ public class WorkflowEngine implements IWorkflowEngine {
                     //===> save current state
                     _workflowPersistence.getWorkflowModifyService().setStateInstance(
                             trans, currentStateInst);
+                    trans.commit();
                 } catch (Throwable e) {
                     trans.rollback();
                     throw e;
@@ -309,15 +314,18 @@ public class WorkflowEngine implements IWorkflowEngine {
                 break;
             }
         }
+        if(nextStateName == null) {
+            throw new WorkflowException("No routerRule matched!");
+        }
 
         //next state meta
         State nextStateMeta = WorkflowUtil.getMetaState(workflowMeta, nextStateName);
-        WfStateInstance nextStateInst = initStateInstance(
+        InitedStateInstance nextStateInst = initStateInstance(
                 user, workflowMeta, workflowInst.getWorkflow_id(),
                 nextStateMeta, stateData);
 
         stateInst.setTo_state_name(nextStateName);
-        stateInst.setTo_state_id(nextStateInst.getTo_state_id());
+        stateInst.setTo_state_id(nextStateInst.stateInstance.getTo_state_id());
 
         if(nextStateMeta.getStateType() == WorkflowEnums.StateTypes.Terminated.ordinal()) {
             workflowInst.setWorkflow_status(WorkflowEnums.WorkflowStatus.Terminated.ordinal());
@@ -328,7 +336,8 @@ public class WorkflowEngine implements IWorkflowEngine {
         IPersistenceTransaction trans = _workflowPersistence.createTransaction();
         try {
             saveWorkflowStateOnMoveToNextState(trans,
-                    workflowInst, stateInst, nextStateInst, stateData);
+                    workflowInst, stateInst, nextStateInst.stateInstance);
+            trans.commit();
         } catch (Throwable e) {
             trans.rollback();
             throw new WorkflowException(e);
@@ -354,8 +363,9 @@ public class WorkflowEngine implements IWorkflowEngine {
                     parentStateMeta, workflowInst.getParent_flow_state_event());
 
             return handleStateRouter(user, parentFlowMeta, parentFlowInst,
-                    parentStateMeta, parentFlowStateInst, stateData,
-                    workflowInst.getParent_flow_state_event(), _xmlSerForStateData.xmlToObj(parentFlowStateInst.getTriggered_event_data()),
+                    parentStateMeta, parentFlowStateInst, nextStateInst.newStateData,
+                    workflowInst.getParent_flow_state_event(),
+                    _xmlSerForStateData.xmlToObj(parentFlowStateInst.getTriggered_event_data()),
                     parentTransition
             );
         } else {
@@ -363,7 +373,7 @@ public class WorkflowEngine implements IWorkflowEngine {
             eventResult.setTo_workflow_name(workflowInst.getWorkflow_name());
             eventResult.setTo_workflow_id(workflowInst.getWorkflow_id());
             eventResult.setTo_state_name(nextStateMeta.getName());
-            eventResult.setTo_state_id(nextStateInst.getState_id());
+            eventResult.setTo_state_id(nextStateInst.stateInstance.getState_id());
 
             return eventResult;
         }
@@ -389,40 +399,14 @@ public class WorkflowEngine implements IWorkflowEngine {
     @Override
     public Object getWorkflowCurrentStateData(String workflowId) throws WorkflowException {
         try {
-            WfInstance workflowInst = _workflowPersistence.getWorkflowQueryService()
-                    .getWorkflowInstance(workflowId);
-            return _xmlSerForStateData.xmlToObj(workflowInst.getCurrent_state_data());
+            WfStateInstance stateInst = _workflowPersistence.getWorkflowQueryService()
+                    .getCurrentStateInstance(workflowId);
+            return _xmlSerForStateData.xmlToObj(stateInst.getState_data());
         } catch (Throwable e) {
             throw new WorkflowException(e);
         }
     }
 
-    @Override
-    public void setWorkflowCurrentStateData(String workflowId, Object stateData) throws WorkflowException {
-        try {
-            WfInstance workflowInst = _workflowPersistence.getWorkflowQueryService()
-                    .getWorkflowInstance(workflowId);
-
-            IPersistenceTransaction trans = _workflowPersistence.createTransaction();
-            try {
-                _workflowPersistence.getWorkflowModifyService().setWorkflowCurrentState(
-                        trans,
-                        workflowId,
-                        workflowInst.getCurrent_state_name(), workflowInst.getCurrent_state_id(),
-                        _xmlSerForStateData.objToXml(stateData)
-                );
-
-                trans.commit();
-            } catch (Throwable e) {
-                trans.rollback();
-                throw e;
-            } finally {
-                trans.close();
-            }
-        } catch (Throwable e) {
-            throw new WorkflowException(e);
-        }
-    }
 
     private void saveWorkflowStateOnFlowCreated(
             IPersistenceTransaction trans,
@@ -452,13 +436,14 @@ public class WorkflowEngine implements IWorkflowEngine {
         //===> workflow
         _workflowPersistence.getWorkflowModifyService().setWorkflowCurrentState(trans,
                 workflowInst.getWorkflow_id(),
-                workflowInst.getCurrent_state_name(), workflowInst.getCurrent_state_id(),
-                workflowInst.getCurrent_state_data()
+                workflowInst.getCurrent_state_name(), workflowInst.getCurrent_state_id()
                 );
 
         //===> state
-        _workflowPersistence.getWorkflowModifyService().setStateInstance(trans, currentStateInst);
-        _workflowPersistence.getWorkflowModifyService().setStateInstance(trans, nextStateInst);
+        _workflowPersistence.getWorkflowModifyService()
+                .setStateInstance(trans, currentStateInst);
+        _workflowPersistence.getWorkflowModifyService()
+                .setStateInstance(trans, nextStateInst);
 
         //===> trace
         saveTrace(trans, workflowInst, nextStateInst);
@@ -472,10 +457,11 @@ public class WorkflowEngine implements IWorkflowEngine {
         traceRecord.setTrace_seq(newTraceSeq());
         traceRecord.setCreate_time(System.currentTimeMillis());
 
-        _workflowPersistence.getWorkflowModifyService().addWorkflowTraceRecord(trans, traceRecord);
+        _workflowPersistence.getWorkflowModifyService()
+                .addWorkflowTraceRecord(trans, traceRecord);
     }
 
-    private WfStateInstance initStateInstance(
+    private InitedStateInstance initStateInstance(
             String user,
             Workflow workflowMeta, String workflowId,
             State stateMeta, Object inData
@@ -484,19 +470,24 @@ public class WorkflowEngine implements IWorkflowEngine {
         checkStateAccessAuthorization(
                 user, workflowMeta, null, stateMeta, null, inData);
 
-        String stateId = _workflowPersistence.newDataId();
         WfStateInstance state = new WfStateInstance();
 
         state.setWorkflow_id(workflowId);
         state.setWorkflow_name(workflowMeta.getName());
 
-        state.setState_id(stateId);
+        state.setState_id(_workflowPersistence.newDataId());
         state.setState_name(stateMeta.getName());
 
         state.setIn_data(_xmlSerForStateData.objToXml(inData));
 
-        state.setCreate_time(System.currentTimeMillis());
+        long curTime = System.currentTimeMillis();
+        state.setCreate_time(curTime);
         state.setCreate_user(user);
+        state.setUpdate_time(curTime);
+        state.setUpdate_user(user);
+
+        InitedStateInstance initedState = new InitedStateInstance();
+        initedState.stateInstance = state;
 
         //init application
         if(stateMeta.getInitApp() != null
@@ -507,9 +498,11 @@ public class WorkflowEngine implements IWorkflowEngine {
                     stateMeta.getInitApp());
 
             state.setState_data(_xmlSerForStateData.objToXml(stateData));
+
+            initedState.newStateData = stateData;
         }
 
-        return state;
+        return initedState;
     }
 
     private void checkStateAccessAuthorization(
@@ -676,4 +669,8 @@ public class WorkflowEngine implements IWorkflowEngine {
         }
     }
 
+    private static class InitedStateInstance {
+        public WfStateInstance stateInstance = null;
+        public Object newStateData = null;
+    }
 }

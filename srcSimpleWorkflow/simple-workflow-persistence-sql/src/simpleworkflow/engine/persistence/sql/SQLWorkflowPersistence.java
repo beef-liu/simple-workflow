@@ -365,12 +365,11 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
         @Override
         public void setWorkflowCurrentState(
                 IPersistenceTransaction trans,
-                String workflowId, String stateName, String stateId,
-                String stateDataXml) throws WorkflowPersistenceException {
+                String workflowId, String stateName, String stateId) throws WorkflowPersistenceException {
             try {
                 _workflowModifyDao.setWorkflowCurrentState(
                         ((SQLPersistenceTransaction)trans).getConnection(),
-                        workflowId, stateName, stateId, stateDataXml
+                        workflowId, stateName, stateId
                 );
             } catch (Throwable e) {
                 throw new WorkflowPersistenceException(e);
@@ -684,11 +683,10 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
                 = " update WfInstance set "
                 + " current_state_name = ?"
                 + " , current_state_id = ?"
-                + " , current_state_data = ?"
                 + " where workflow_id = ?";
         public int setWorkflowCurrentState(
                 Connection conn,
-                String workflowId, String stateName, String stateId, String stateDataXml
+                String workflowId, String stateName, String stateId
         ) throws SQLException {
             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_CURRENT_STATE);
             try {
@@ -696,7 +694,6 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
 
                 stmt.setString(index++, stateName);
                 stmt.setString(index++, stateId);
-                stmt.setString(index++, stateDataXml);
                 stmt.setString(index++, workflowId);
 
                 return stmt.executeUpdate();

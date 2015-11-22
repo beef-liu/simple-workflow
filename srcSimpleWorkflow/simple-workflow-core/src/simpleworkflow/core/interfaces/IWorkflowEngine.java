@@ -79,6 +79,5 @@ public interface IWorkflowEngine {
      */
     public Object getWorkflowCurrentStateData(String workflowId) throws WorkflowException;
 
-    public void setWorkflowCurrentStateData(String workflowId, Object stateData) throws WorkflowException;
 
 }

@@ -33,7 +33,6 @@ public class WfMetaUtil {
         workflow.setAuthor(wfMeta.getAuthor());
         workflow.setEngineName(wfMeta.getEngineName());
         workflow.setStartState(wfMeta.getStartState());
-        workflow.setStateDataType(wfMeta.getStateDataType());
 
         workflow.setStates((List<State>) XmlDeserializer.stringToObject(
                 wfMeta.getStates(), ArrayList.class, classFinder));
@@ -54,7 +53,6 @@ public class WfMetaUtil {
         wfMeta.setAuthor(workflow.getAuthor());
         wfMeta.setEngineName(workflow.getEngineName());
         wfMeta.setStartState(workflow.getStartState());
-        wfMeta.setStateDataType(workflow.getStateDataType());
 
         wfMeta.setStates(XmlSerializer.objectToString(workflow.getStates(), ArrayList.class));
 
