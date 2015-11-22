@@ -11,7 +11,8 @@ public class State extends MetaBaseData {
 
     /**
      * This application will be executed before create state instance.
-     * Return value should be type of stateData
+     * The input data is the state data of previous state.
+     * Return value should be current state data,
      */
     private Application _initApp;
 

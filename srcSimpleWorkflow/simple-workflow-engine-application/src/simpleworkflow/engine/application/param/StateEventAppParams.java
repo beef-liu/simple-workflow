@@ -8,7 +8,7 @@ import simpleworkflow.core.meta.Workflow;
  * It is the type of parameter of method of application of Event.accessibleCheck and Activity.application
  * @author XingGu_Liu
  */
-public class StateEventAppParams extends StateInitAppParams {
+public class StateEventAppParams extends StateAppParams {
 
     private String _eventName;
 

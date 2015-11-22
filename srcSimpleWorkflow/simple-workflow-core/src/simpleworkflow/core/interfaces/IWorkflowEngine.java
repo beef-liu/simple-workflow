@@ -30,11 +30,12 @@ public interface IWorkflowEngine {
      * Create a workflow
      * @param user
      * @param workflowName
+     * @param inData input data for the start state
      * @return
      * @throws WorkflowException
      */
     public WfInstance createWorkflow(
-            String user, String workflowName, Object stateData
+            String user, String workflowName, Object inData
             ) throws WorkflowException;
 
     /**
@@ -42,7 +43,7 @@ public interface IWorkflowEngine {
      * If parentWorkflowId is null, then it is not a sub workflow just same as the method 'createWorkflow'.
      * @param user
      * @param workflowName
-     * @param stateData
+     * @param inData input data for the start state
      * @param parentWorkflowId
      * @param parentWorkflowStateId
      * @param parentWorkflowEventName
@@ -50,7 +51,7 @@ public interface IWorkflowEngine {
      * @throws WorkflowException
      */
     public WfInstance createSubWorkflow(
-            String user, String workflowName, Object stateData,
+            String user, String workflowName, Object inData,
             String parentWorkflowId, String parentWorkflowStateId, String parentWorkflowEventName
             ) throws WorkflowException;
 

@@ -9,7 +9,7 @@ import simpleworkflow.core.meta.Workflow;
  * workflowId could be null when the state is the 1st state of the workflow.
  * @author XingGu_Liu
  */
-public class StateInitAppParams {
+public class StateAppParams {
     private IWorkflowEngine _engine;
 
     private String _user;
@@ -22,22 +22,22 @@ public class StateInitAppParams {
 
     private String _stateId;
 
-    private Object _inData;
+    private Object _stateData;
 
-    public StateInitAppParams() {
+    public StateAppParams() {
     }
 
-    public StateInitAppParams(
+    public StateAppParams(
             IWorkflowEngine engine, String user,
             Workflow workflowMeta, String workflowId,
-            State stateMeta, String stateId, Object inData) {
+            State stateMeta, String stateId, Object stateData) {
         _engine = engine;
         _user = user;
         _workflowMeta = workflowMeta;
         _workflowId = workflowId;
         _stateMeta = stateMeta;
         _stateId = stateId;
-        _inData = inData;
+        _stateData = stateData;
     }
 
     public IWorkflowEngine getEngine() {
@@ -88,11 +88,11 @@ public class StateInitAppParams {
         _stateId = stateId;
     }
 
-    public Object getInData() {
-        return _inData;
+    public Object getStateData() {
+        return _stateData;
     }
 
-    public void setInData(Object inData) {
-        _inData = inData;
+    public void setStateData(Object stateData) {
+        _stateData = stateData;
     }
 }

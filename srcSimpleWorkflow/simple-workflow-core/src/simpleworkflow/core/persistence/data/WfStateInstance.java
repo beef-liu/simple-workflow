@@ -14,9 +14,15 @@ public class WfStateInstance {
 
 
     /**
-     * StateData value when workflow just go to this state
+     * Input data from previous state's state data
      */
-    private String _in_state_data = null;
+    private String _in_data = null;
+
+    /**
+     * State data of current state.(Be initiated by initApp,
+     * and value could be changed by activity)
+     */
+    private String _state_data = null;
 
     private String _triggered_event = null;
     private String _triggered_event_data = null;
@@ -70,12 +76,20 @@ public class WfStateInstance {
         _state_name = state_name;
     }
 
-    public String getIn_state_data() {
-        return _in_state_data;
+    public String getIn_data() {
+        return _in_data;
     }
 
-    public void setIn_state_data(String in_state_data) {
-        _in_state_data = in_state_data;
+    public void setIn_data(String in_data) {
+        _in_data = in_data;
+    }
+
+    public String getState_data() {
+        return _state_data;
+    }
+
+    public void setState_data(String state_data) {
+        _state_data = state_data;
     }
 
     public String getTriggered_event() {

@@ -18,8 +18,6 @@ public class WfMeta {
 
     private String _startState = "";
 
-    private String _stateDataType = "";
-
     private String _states;
 
 
@@ -69,14 +67,6 @@ public class WfMeta {
 
     public void setStartState(String startState) {
         _startState = startState;
-    }
-
-    public String getStateDataType() {
-        return _stateDataType;
-    }
-
-    public void setStateDataType(String stateDataType) {
-        _stateDataType = stateDataType;
     }
 
     public String getStates() {
