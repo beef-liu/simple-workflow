@@ -5,7 +5,6 @@ CREATE TABLE `WfInstance` (
   `workflow_status` int(11) DEFAULT NULL,
   `current_state_name` char(64) DEFAULT NULL,
   `current_state_id` char(32) DEFAULT NULL,
-  `current_state_data` longtext,
   `parent_flow_id` char(32) DEFAULT NULL,
   `parent_flow_state_id` char(32) DEFAULT NULL,
   `parent_flow_state_event` char(64) DEFAULT NULL,
@@ -22,7 +21,6 @@ CREATE TABLE `WfMeta` (
   `author` char(32) DEFAULT NULL,
   `engineName` char(128) DEFAULT NULL,
   `startState` char(64) DEFAULT NULL,
-  `stateDataType` char(128) DEFAULT NULL,
   `states` longtext,
   PRIMARY KEY (`name`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -32,7 +30,8 @@ CREATE TABLE `WfStateInstance` (
   `workflow_id` char(32) NOT NULL,
   `workflow_name` char(64) DEFAULT NULL,
   `state_name` char(64) DEFAULT NULL,
-  `in_state_data` longtext,
+  `in_data` longtext,
+  `state_data` longtext,
   `triggered_event` char(64) DEFAULT NULL,
   `triggered_event_data` longtext,
   `triggered_subflow_id` char(32) DEFAULT NULL,
