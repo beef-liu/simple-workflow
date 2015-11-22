@@ -467,6 +467,7 @@ public class WorkflowEngine implements IWorkflowEngine {
         traceRecord.setState_id(currentStateInst.getState_id());
         traceRecord.setParent_workflow_id(workflowInst.getParent_flow_id());
         traceRecord.setTrace_seq(newTraceSeq());
+        traceRecord.setCreate_time(System.currentTimeMillis());
 
         _workflowPersistence.getWorkflowModifyService().addWorkflowTraceRecord(trans, traceRecord);
     }

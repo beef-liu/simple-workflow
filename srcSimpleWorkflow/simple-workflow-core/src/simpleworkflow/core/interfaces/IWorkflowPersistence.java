@@ -15,11 +15,6 @@ import java.util.List;
  */
 public interface IWorkflowPersistence {
 
-    public void init(String configFilePath,
-                     IClassFinder classFinderForWorkflowCoreData, IClassFinder classFinderForStateData);
-
-    public void destroy();
-
     public IPersistenceTransaction createTransaction();
 
     public IWorkflowQueryService getWorkflowQueryService();
@@ -81,7 +76,7 @@ public interface IWorkflowPersistence {
          * @return
          */
         public List<WfInstance> findWorkflowInstatncesCreatedInTimeSpan(
-                String workflowName, long startTime, long endTime);
+                String workflowName, long startTime, long endTime) throws WorkflowPersistenceException;
 
         /**
          * Find WorkflowInstances sorted by create_time in descending
@@ -93,7 +88,7 @@ public interface IWorkflowPersistence {
          */
         public List<WfInstance> findWorkflowInstatncesCreatedInTimeSpan(
                 String workflowName, long startTime, long endTime,
-                WorkflowEnums.WorkflowStatus workflowStatus);
+                WorkflowEnums.WorkflowStatus workflowStatus) throws WorkflowPersistenceException;
 
         /**
          * Find WorkflowInstances sorted by update_time in descending
@@ -103,7 +98,7 @@ public interface IWorkflowPersistence {
          * @return
          */
         public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
-                String workflowName, long startTime, long endTime);
+                String workflowName, long startTime, long endTime) throws WorkflowPersistenceException;
 
         /**
          * Find WorkflowInstances sorted by update_time in descending
@@ -115,7 +110,7 @@ public interface IWorkflowPersistence {
          */
         public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
                 String workflowName, long startTime, long endTime,
-                WorkflowEnums.WorkflowStatus workflowStatus);
+                WorkflowEnums.WorkflowStatus workflowStatus) throws WorkflowPersistenceException;
     }
 
     public static interface IWorkflowModifyService {
@@ -134,14 +129,6 @@ public interface IWorkflowPersistence {
          * @throws WorkflowPersistenceException
          */
         public void setWorkflowInstance(IPersistenceTransaction trans, WfInstance data) throws WorkflowPersistenceException;
-
-        /**
-         * save trace instance which contains all trace records
-         * @param trans
-         * @param data workflow trace instance
-         * @throws WorkflowPersistenceException
-         */
-        public void setWorkflowTraceInstance(IPersistenceTransaction trans, WfTraceInstance data) throws WorkflowPersistenceException;
 
         /**
          * add a trace record

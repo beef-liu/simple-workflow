@@ -12,6 +12,8 @@ public class WfTraceRecord {
 
     private String _state_id;
 
+    private long _create_time;
+
     public String getWorkflow_id() {
         return _workflow_id;
     }
@@ -42,5 +44,13 @@ public class WfTraceRecord {
 
     public void setState_id(String state_id) {
         _state_id = state_id;
+    }
+
+    public long getCreate_time() {
+        return _create_time;
+    }
+
+    public void setCreate_time(long create_time) {
+        _create_time = create_time;
     }
 }

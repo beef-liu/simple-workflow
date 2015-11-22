@@ -1,11 +1,9 @@
 package simpleworkflow.core.interfaces;
 
 import simpleworkflow.core.WorkflowException;
-import simpleworkflow.core.meta.State;
 import simpleworkflow.core.meta.Workflow;
 import simpleworkflow.core.persistence.data.WfInstance;
 import simpleworkflow.core.persistence.data.WfStateEventResult;
-import simpleworkflow.core.persistence.data.WfStateInstance;
 
 /**
  * @author XingGu_Liu
