@@ -254,6 +254,7 @@ public class WorkflowEngine implements IWorkflowEngine {
 
                 eventResult.setTo_workflow_name(subflowInst.getWorkflow_name());
                 eventResult.setTo_workflow_id(subflowInst.getWorkflow_id());
+                eventResult.setTo_workflow_status(subflowInst.getWorkflow_status());
                 eventResult.setTo_state_name(subflowInst.getCurrent_state_name());
                 eventResult.setTo_state_id(subflowInst.getCurrent_state_id());
 
@@ -306,7 +307,7 @@ public class WorkflowEngine implements IWorkflowEngine {
                     user, workflowMeta, workflowInst.getWorkflow_id(),
                     stateMeta, stateInst.getState_id(), stateData,
                     eventName, eventData,
-                    routerRule.getName(),
+                    routerRule.getName(), routerRule.getToState(),
                     routerRule.getBoolCondition()
             );
             if(isRightRouter) {
@@ -372,6 +373,7 @@ public class WorkflowEngine implements IWorkflowEngine {
             WfStateEventResult eventResult = new WfStateEventResult();
             eventResult.setTo_workflow_name(workflowInst.getWorkflow_name());
             eventResult.setTo_workflow_id(workflowInst.getWorkflow_id());
+            eventResult.setTo_workflow_status(workflowInst.getWorkflow_status());
             eventResult.setTo_state_name(nextStateMeta.getName());
             eventResult.setTo_state_id(nextStateInst.stateInstance.getState_id());
 
@@ -592,7 +594,7 @@ public class WorkflowEngine implements IWorkflowEngine {
             Workflow workflowMeta, String workflowId,
             State stateMeta, String stateId, Object stateData,
             String eventName, Object eventData,
-            String routerRuleName,
+            String routerRuleName, String toState,
             Application application
     ) throws WorkflowException {
         final StateRouterRuleAppParams appParams = new StateRouterRuleAppParams(
@@ -600,7 +602,7 @@ public class WorkflowEngine implements IWorkflowEngine {
                 workflowMeta, workflowId,
                 stateMeta, stateId, stateData,
                 eventName, eventData,
-                routerRuleName
+                routerRuleName, toState
         );
         return (Boolean) _applicationLoader.executeApplication(application, appParams);
     }

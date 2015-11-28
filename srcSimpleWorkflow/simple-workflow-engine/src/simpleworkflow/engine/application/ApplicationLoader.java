@@ -31,8 +31,7 @@ public class ApplicationLoader implements IApplicationLoader {
     @Override
     public Object executeApplication(Application appMeta, Object appParams) throws WorkflowException {
         try {
-            ApplicationRunScheme runScheme = (ApplicationRunScheme) XmlDeserializer.stringToObject(
-                    appMeta.getRun_scheme(), ApplicationRunScheme.class);
+            ApplicationRunScheme runScheme = ApplicationRunScheme.deserialize(appMeta.getRun_scheme()); 
 
             if(ApplicationRunScheme.RunSchemeAppTypes.Java.equalsIgnoreCase(runScheme.getAppType())) {
                 return executeApplicationOfJava(runScheme, appParams);

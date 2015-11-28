@@ -6,10 +6,12 @@ package simpleworkflow.core.persistence.data;
 public class WfStateEventResult {
     private String _to_workflow_name;
     private String _to_workflow_id;
+    private int _to_workflow_status;
 
     private String _to_state_name;
     private String _to_state_id;
 
+    
     public String getTo_workflow_name() {
         return _to_workflow_name;
     }
@@ -41,4 +43,15 @@ public class WfStateEventResult {
     public void setTo_state_id(String to_state_id) {
         _to_state_id = to_state_id;
     }
+
+	public int getTo_workflow_status() {
+		return _to_workflow_status;
+	}
+
+	public void setTo_workflow_status(int to_workflow_status) {
+		_to_workflow_status = to_workflow_status;
+	}
+
+    
+    
 }

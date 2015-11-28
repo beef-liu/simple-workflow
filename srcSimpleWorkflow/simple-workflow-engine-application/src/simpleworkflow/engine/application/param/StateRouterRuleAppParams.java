@@ -10,6 +10,7 @@ import simpleworkflow.core.meta.Workflow;
  */
 public class StateRouterRuleAppParams extends StateEventAppParams {
     private String _routerRuleName;
+    private String _toState;
 
     public StateRouterRuleAppParams() {
     }
@@ -19,11 +20,12 @@ public class StateRouterRuleAppParams extends StateEventAppParams {
             Workflow workflowMeta, String workflowId,
             State stateMeta, String stateId, Object stateData,
             String eventName, Object eventData,
-            String routerRuleName
+            String routerRuleName, String toState
     ) {
         super(engine, user, workflowMeta, workflowId, stateMeta, stateId, stateData, eventName, eventData);
 
         _routerRuleName = routerRuleName;
+        _toState = toState;
     }
 
     public String getRouterRuleName() {
@@ -33,4 +35,14 @@ public class StateRouterRuleAppParams extends StateEventAppParams {
     public void setRouterRuleName(String routerRuleName) {
         _routerRuleName = routerRuleName;
     }
+
+	public String getToState() {
+		return _toState;
+	}
+
+	public void setToState(String toState) {
+		_toState = toState;
+	}
+    
+    
 }
