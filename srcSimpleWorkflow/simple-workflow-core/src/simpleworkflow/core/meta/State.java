@@ -11,8 +11,8 @@ public class State extends MetaBaseData {
 
     /**
      * This application will be executed before create state instance.
-     * The input data is the state data of previous state.
-     * Return value should be current state data,
+     * The input data is the state data of previous state or inData if it's the start of workflow.
+     * Return value should be current state data
      */
     private Application _initApp;
 

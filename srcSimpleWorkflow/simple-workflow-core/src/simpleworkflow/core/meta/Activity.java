@@ -6,8 +6,7 @@ package simpleworkflow.core.meta;
 public class Activity extends MetaBaseData {
 
     /**
-     * It will be ignored when subflowFlag == true.
-     * Return value should be type of stateData
+     * Value of application returns should be type of stateData. 
      */
     private Application _application;
 
