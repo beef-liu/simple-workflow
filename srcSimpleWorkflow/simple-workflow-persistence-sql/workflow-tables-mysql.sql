@@ -8,8 +8,10 @@ CREATE TABLE `WfInstance` (
   `parent_flow_id` char(32) DEFAULT NULL,
   `parent_flow_state_id` char(32) DEFAULT NULL,
   `parent_flow_state_event` char(64) DEFAULT NULL,
-  `update_time` bigint(20) DEFAULT NULL,
+  `create_user` char(32) DEFAULT NULL,
+  `update_user` char(32) DEFAULT NULL,
   `create_time` bigint(20) DEFAULT NULL,
+  `update_time` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`workflow_id`),
   KEY `IDX1` (`workflow_status`,`update_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

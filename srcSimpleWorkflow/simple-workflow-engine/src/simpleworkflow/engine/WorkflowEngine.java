@@ -118,11 +118,13 @@ public class WorkflowEngine implements IWorkflowEngine {
             WfInstance workflowInst = new WfInstance();
             workflowInst.setWorkflow_id(_workflowPersistence.newDataId());
             workflowInst.setWorkflow_name(workflowName);
-            workflowInst.setWorkflow_version(newWorkflowVersion());
+            workflowInst.setWorkflow_version(workflowMeta.getVersion());
             workflowInst.setWorkflow_status(WorkflowEnums.WorkflowStatus.Running.ordinal());
             workflowInst.setCurrent_state_name(startStateName);
 
             long curTime = System.currentTimeMillis();
+            workflowInst.setCreate_user(user);
+            workflowInst.setUpdate_user(user);
             workflowInst.setCreate_time(curTime);
             workflowInst.setUpdate_time(curTime);
 
@@ -326,7 +328,7 @@ public class WorkflowEngine implements IWorkflowEngine {
                 nextStateMeta, stateData);
 
         stateInst.setTo_state_name(nextStateName);
-        stateInst.setTo_state_id(nextStateInst.stateInstance.getTo_state_id());
+        stateInst.setTo_state_id(nextStateInst.stateInstance.getState_id());
 
         if(nextStateMeta.getStateType() == WorkflowEnums.StateTypes.Terminated.ordinal()) {
             workflowInst.setWorkflow_status(WorkflowEnums.WorkflowStatus.Terminated.ordinal());
@@ -336,7 +338,9 @@ public class WorkflowEngine implements IWorkflowEngine {
 
         IPersistenceTransaction trans = _workflowPersistence.createTransaction();
         try {
-            saveWorkflowStateOnMoveToNextState(trans,
+            saveWorkflowStateOnMoveToNextState(
+            		trans,
+            		user,
                     workflowInst, stateInst, nextStateInst.stateInstance);
             trans.commit();
         } catch (Throwable e) {
@@ -382,7 +386,8 @@ public class WorkflowEngine implements IWorkflowEngine {
     }
 
     @Override
-    public void updateMetaWorkflow(Workflow data) throws WorkflowException {
+    public long updateMetaWorkflow(Workflow data) throws WorkflowException {
+    	data.setEngineName(getEngineName());
         data.setVersion(newWorkflowVersion());
 
         IPersistenceTransaction trans = _workflowPersistence.createTransaction();
@@ -391,8 +396,11 @@ public class WorkflowEngine implements IWorkflowEngine {
                     .setMetaWorkflow(trans, data);
 
             trans.commit();
+            
+            return data.getVersion();
         } catch (WorkflowPersistenceException e) {
             trans.rollback();
+            throw e;
         } finally {
             trans.close();
         }
@@ -428,17 +436,23 @@ public class WorkflowEngine implements IWorkflowEngine {
 
     private void saveWorkflowStateOnMoveToNextState(
             IPersistenceTransaction trans,
+            String user,
             WfInstance workflowInst,
             WfStateInstance currentStateInst, WfStateInstance nextStateInst
     ) throws WorkflowPersistenceException, IOException, IntrospectionException, IllegalAccessException, InvocationTargetException {
         workflowInst.setCurrent_state_id(nextStateInst.getState_id());
         workflowInst.setCurrent_state_name(nextStateInst.getState_name());
         //workflowInst.setCurrent_state_data(_xmlSerForStateData.objToXml(stateData));
+        workflowInst.setUpdate_user(user);
+        workflowInst.setUpdate_time(System.currentTimeMillis());
 
         //===> workflow
         _workflowPersistence.getWorkflowModifyService().setWorkflowCurrentState(trans,
                 workflowInst.getWorkflow_id(),
-                workflowInst.getCurrent_state_name(), workflowInst.getCurrent_state_id()
+                workflowInst.getCurrent_state_name(), workflowInst.getCurrent_state_id(),
+                workflowInst.getWorkflow_status(),
+                workflowInst.getUpdate_user(),
+                workflowInst.getUpdate_time()
                 );
 
         //===> state
@@ -470,7 +484,7 @@ public class WorkflowEngine implements IWorkflowEngine {
     ) throws WorkflowException, IOException, IntrospectionException, IllegalAccessException, InvocationTargetException {
         //check state access authority
         checkStateAccessAuthorization(
-                user, workflowMeta, null, stateMeta, null, inData);
+                user, workflowMeta, workflowId, stateMeta, null, inData);
 
         WfStateInstance state = new WfStateInstance();
 
@@ -494,14 +508,16 @@ public class WorkflowEngine implements IWorkflowEngine {
         //init application
         if(stateMeta.getInitApp() != null
                 && !isEmpty(stateMeta.getInitApp().getRun_scheme())) {
-            Object stateData = executeApplicationOfStateInit(
-                    user, workflowMeta, null,
-                    stateMeta, null, inData,
+        	Object stateData = executeApplicationOfStateInit(
+                    user, workflowMeta, workflowId,
+                    stateMeta, state.getState_id(), inData,
                     stateMeta.getInitApp());
 
             state.setState_data(_xmlSerForStateData.objToXml(stateData));
-
             initedState.newStateData = stateData;
+        } else {
+            state.setState_data(state.getIn_data());
+            initedState.newStateData = inData;
         }
 
         return initedState;

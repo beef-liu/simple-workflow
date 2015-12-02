@@ -2,9 +2,11 @@ package simpleworkflow.engine.persistence.sql;
 
 import MetoXML.Base.XmlParseException;
 import MetoXML.Util.ClassFinder;
+
 import com.salama.service.clouddata.util.dao.QueryDataDao;
 import com.salama.service.clouddata.util.dao.UpdateDataDao;
 import com.salama.util.db.JDBCUtil;
+
 import simpleworkflow.core.WorkflowEnums;
 import simpleworkflow.core.interfaces.IClassFinder;
 import simpleworkflow.core.interfaces.IPersistenceTransaction;
@@ -365,11 +367,15 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
         @Override
         public void setWorkflowCurrentState(
                 IPersistenceTransaction trans,
-                String workflowId, String stateName, String stateId) throws WorkflowPersistenceException {
+                String workflowId, String stateName, String stateId,
+                int workflowStatus, 
+                String updateUser, long updateTime
+                ) throws WorkflowPersistenceException {
             try {
                 _workflowModifyDao.setWorkflowCurrentState(
                         ((SQLPersistenceTransaction)trans).getConnection(),
-                        workflowId, stateName, stateId
+                        workflowId, stateName, stateId, workflowStatus,
+                        updateUser, updateTime
                 );
             } catch (Throwable e) {
                 throw new WorkflowPersistenceException(e);
@@ -476,7 +482,11 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
 
                 ResultSet rs = stmt.executeQuery();
 
-                return (WfInstance) JDBCUtil.ResultSetToData(rs, WfInstance.class, true);
+                if(rs.next()) {
+                    return (WfInstance) JDBCUtil.ResultSetToData(rs, WfInstance.class, true);
+                } else {
+                	return null;
+                }
             } finally {
                 stmt.close();
             }
@@ -517,9 +527,13 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
                 stmt.setString(index++, stateId);
 
                 ResultSet rs = stmt.executeQuery();
-
-                return (WfStateInstance) JDBCUtil.ResultSetToData(
-                        rs, WfStateInstance.class, true);
+                
+                if(rs.next()) {
+                    return (WfStateInstance) JDBCUtil.ResultSetToData(
+                            rs, WfStateInstance.class, true);
+                } else {
+                	return null;
+                }
             } finally {
                 stmt.close();
             }
@@ -542,8 +556,12 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
 
                 ResultSet rs = stmt.executeQuery();
 
-                return (WfStateInstance) JDBCUtil.ResultSetToData(
-                        rs, WfStateInstance.class, true);
+                if(rs.next()) {
+                    return (WfStateInstance) JDBCUtil.ResultSetToData(
+                            rs, WfStateInstance.class, true);
+                } else {
+                	return null;
+                }
             } finally {
                 stmt.close();
             }
@@ -683,10 +701,16 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
                 = " update WfInstance set "
                 + " current_state_name = ?"
                 + " , current_state_id = ?"
+                + " , workflow_status = ?"
+                + " , update_user = ?"
+                + " , update_time = ?"
                 + " where workflow_id = ?";
         public int setWorkflowCurrentState(
                 Connection conn,
-                String workflowId, String stateName, String stateId
+                String workflowId, 
+                String stateName, String stateId,
+                int workflowStatus,
+                String updateUser, long updateTime
         ) throws SQLException {
             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_CURRENT_STATE);
             try {
@@ -694,6 +718,10 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
 
                 stmt.setString(index++, stateName);
                 stmt.setString(index++, stateId);
+                stmt.setInt(index++, workflowStatus);
+                stmt.setString(index++, updateUser);
+                stmt.setLong(index++, updateTime);
+                
                 stmt.setString(index++, workflowId);
 
                 return stmt.executeUpdate();

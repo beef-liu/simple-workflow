@@ -70,7 +70,13 @@ public interface IWorkflowEngine {
             String eventName, Object eventData
     ) throws WorkflowException;
 
-    public void updateMetaWorkflow(Workflow data) throws WorkflowException;
+    /**
+     * save workflow meta with new version number
+     * @param data
+     * @return new version number
+     * @throws WorkflowException
+     */
+    public long updateMetaWorkflow(Workflow data) throws WorkflowException;
 
     /**
      *

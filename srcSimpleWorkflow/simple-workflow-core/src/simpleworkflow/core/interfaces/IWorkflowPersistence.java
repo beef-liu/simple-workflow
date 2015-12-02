@@ -159,7 +159,10 @@ public interface IWorkflowPersistence {
                 IPersistenceTransaction trans,
                 String workflowId,
                 String stateName,
-                String stateId
+                String stateId,
+                int workflowStatus,
+                String updateUser,
+                long updateTime
                 ) throws WorkflowPersistenceException;
     }
 

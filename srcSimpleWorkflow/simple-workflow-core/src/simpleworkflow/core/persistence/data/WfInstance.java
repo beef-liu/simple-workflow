@@ -27,6 +27,10 @@ public class WfInstance {
      */
     private String _parent_flow_state_event = null;
 
+    private String _create_user;
+    
+    private String _update_user;
+    
     private long _update_time;
 
     private long _create_time;
@@ -106,7 +110,23 @@ public class WfInstance {
         _current_state_name = current_state_name;
     }
 
-    public long getUpdate_time() {
+    public String getCreate_user() {
+		return _create_user;
+	}
+
+	public void setCreate_user(String create_user) {
+		_create_user = create_user;
+	}
+
+	public String getUpdate_user() {
+		return _update_user;
+	}
+
+	public void setUpdate_user(String update_user) {
+		_update_user = update_user;
+	}
+
+	public long getUpdate_time() {
         return _update_time;
     }
 
