@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+
 import simpleworkflow.core.error.WorkflowPersistenceException;
 import simpleworkflow.core.interfaces.IClassFinder;
 import simpleworkflow.core.interfaces.IPersistenceTransaction;
@@ -39,6 +41,7 @@ import com.salama.util.db.JDBCUtil;
  * @author XingGu_Liu
  */
 public class SQLWorkflowPersistence implements IWorkflowPersistence {
+	private final static Logger logger = Logger.getLogger(SQLWorkflowPersistence.class);
 
     private final byte _serverNum;
     private final Random _rand;
@@ -733,6 +736,10 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
             			.concat(",").concat(Long.toString(rowPageSize));
             }
 
+            if(logger.isDebugEnabled()) {
+                logger.debug("statementWithSelectPartForFindWorkflowInstatncesInTimeSpan() sql:" + sql.toString());
+            }
+            
             PreparedStatement stmt = conn.prepareStatement(sql,
                     ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             
