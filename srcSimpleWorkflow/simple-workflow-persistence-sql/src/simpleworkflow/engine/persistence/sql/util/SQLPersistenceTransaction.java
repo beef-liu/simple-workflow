@@ -1,10 +1,10 @@
 package simpleworkflow.engine.persistence.sql.util;
 
-import simpleworkflow.core.interfaces.IPersistenceTransaction;
-import simpleworkflow.core.persistence.WorkflowPersistenceException;
-
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import simpleworkflow.core.error.WorkflowPersistenceException;
+import simpleworkflow.core.interfaces.IPersistenceTransaction;
 
 /**
  * @author XingGu_Liu

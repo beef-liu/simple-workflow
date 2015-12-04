@@ -1,6 +1,6 @@
 package simpleworkflow.core.interfaces;
 
-import simpleworkflow.core.persistence.WorkflowPersistenceException;
+import simpleworkflow.core.error.WorkflowPersistenceException;
 
 /**
  * @author XingGu_Liu

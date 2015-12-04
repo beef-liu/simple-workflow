@@ -1,18 +1,25 @@
 package simpleworkflow.engine.persistence.sql;
 
-import MetoXML.Base.XmlParseException;
-import MetoXML.Util.ClassFinder;
+import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import com.salama.service.clouddata.util.dao.QueryDataDao;
-import com.salama.service.clouddata.util.dao.UpdateDataDao;
-import com.salama.util.db.JDBCUtil;
-
-import simpleworkflow.core.WorkflowEnums;
+import simpleworkflow.core.error.WorkflowPersistenceException;
 import simpleworkflow.core.interfaces.IClassFinder;
 import simpleworkflow.core.interfaces.IPersistenceTransaction;
 import simpleworkflow.core.interfaces.IWorkflowPersistence;
 import simpleworkflow.core.meta.Workflow;
-import simpleworkflow.core.persistence.WorkflowPersistenceException;
 import simpleworkflow.core.persistence.data.WfInstance;
 import simpleworkflow.core.persistence.data.WfStateInstance;
 import simpleworkflow.core.persistence.data.WfTraceInstance;
@@ -21,17 +28,12 @@ import simpleworkflow.engine.persistence.sql.data.WfMeta;
 import simpleworkflow.engine.persistence.sql.util.HexUtil;
 import simpleworkflow.engine.persistence.sql.util.SQLPersistenceTransaction;
 import simpleworkflow.engine.persistence.sql.util.WfMetaUtil;
+import MetoXML.Base.XmlParseException;
+import MetoXML.Util.ClassFinder;
 
-import java.beans.IntrospectionException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.salama.service.clouddata.util.dao.QueryDataDao;
+import com.salama.service.clouddata.util.dao.UpdateDataDao;
+import com.salama.util.db.JDBCUtil;
 
 /**
  * @author XingGu_Liu
@@ -233,19 +235,64 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
                 throw new WorkflowPersistenceException(e);
             }
         }
-
+        
         @Override
-        public List<WfInstance> findWorkflowInstatncesCreatedInTimeSpan(
-                String workflowName, long startTime, long endTime)
-                throws WorkflowPersistenceException {
+        public List<WfStateInstance> findStateInstancesInTraceOrder(String workflowId)
+        		throws WorkflowPersistenceException {
             try {
                 Connection conn = _dbSource.getConnection();
                 try {
-                    return _workflowQueryDao.findWorkflowInstatncesUpdatedInTimeSpan(conn,
-                            false,
-                            workflowName, startTime, endTime,
-                            Integer.MIN_VALUE
-                            );
+                    return _workflowQueryDao.findStateInstancesInTraceOrder(conn, workflowId);
+                } finally {
+                    conn.close();
+                }
+            } catch (Throwable e) {
+                throw new WorkflowPersistenceException(e);
+            }
+        }
+        
+        @Override
+        public List<WfInstance> findWorkflowInstatncesInTimeSpan(
+        		long rowOffset, long rowPageSize, 
+        		String workflow_name, 
+        		String create_user, String update_user,
+        		QueryFilterOfTimeSpan filterOfTimeSpan,
+        		QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+        		long startTime, long endTime, 
+        		String current_state_name)
+        		throws WorkflowPersistenceException {
+            try {
+                Connection conn = _dbSource.getConnection();
+                try {
+                    return _workflowQueryDao.findWorkflowInstatncesInTimeSpan(
+                    		conn, rowOffset, rowPageSize, 
+                    		workflow_name, create_user, update_user, 
+                    		filterOfTimeSpan, filterOfWorkflowStatus, 
+                    		startTime, endTime, 
+                    		current_state_name); 
+                } finally {
+                    conn.close();
+                }
+            } catch (Throwable e) {
+                throw new WorkflowPersistenceException(e);
+            }
+        }
+        
+        @Override
+        public long countWorkflowInstatncesInTimeSpan(
+        		String workflow_name, String create_user,
+        		String update_user, QueryFilterOfTimeSpan filterOfTimeSpan,
+        		QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+        		long startTime, long endTime, String current_state_name)
+        		throws WorkflowPersistenceException {
+            try {
+                Connection conn = _dbSource.getConnection();
+                try {
+                    return _workflowQueryDao.countWorkflowInstatncesInTimeSpan(
+                    		conn, 
+                    		workflow_name, create_user, update_user, 
+                    		filterOfTimeSpan, filterOfWorkflowStatus, 
+                    		startTime, endTime, current_state_name); 
                 } finally {
                     conn.close();
                 }
@@ -254,64 +301,6 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
             }
         }
 
-        @Override
-        public List<WfInstance> findWorkflowInstatncesCreatedInTimeSpan(
-                String workflowName, long startTime, long endTime,
-                WorkflowEnums.WorkflowStatus workflowStatus) throws WorkflowPersistenceException {
-            try {
-                Connection conn = _dbSource.getConnection();
-                try {
-                    return _workflowQueryDao.findWorkflowInstatncesUpdatedInTimeSpan(conn,
-                            false,
-                            workflowName, startTime, endTime,
-                            workflowStatus.ordinal()
-                    );
-                } finally {
-                    conn.close();
-                }
-            } catch (Throwable e) {
-                throw new WorkflowPersistenceException(e);
-            }
-        }
-
-        @Override
-        public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
-                String workflowName, long startTime, long endTime) throws WorkflowPersistenceException {
-            try {
-                Connection conn = _dbSource.getConnection();
-                try {
-                    return _workflowQueryDao.findWorkflowInstatncesUpdatedInTimeSpan(conn,
-                            true,
-                            workflowName, startTime, endTime,
-                            Integer.MIN_VALUE
-                    );
-                } finally {
-                    conn.close();
-                }
-            } catch (Throwable e) {
-                throw new WorkflowPersistenceException(e);
-            }
-        }
-
-        @Override
-        public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
-                String workflowName, long startTime, long endTime,
-                WorkflowEnums.WorkflowStatus workflowStatus) throws WorkflowPersistenceException {
-            try {
-                Connection conn = _dbSource.getConnection();
-                try {
-                    return _workflowQueryDao.findWorkflowInstatncesUpdatedInTimeSpan(conn,
-                            true,
-                            workflowName, startTime, endTime,
-                            workflowStatus.ordinal()
-                    );
-                } finally {
-                    conn.close();
-                }
-            } catch (Throwable e) {
-                throw new WorkflowPersistenceException(e);
-            }
-        }
     }
 
     private class WorkflowModifyService implements IWorkflowModifyService {
@@ -566,6 +555,25 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
                 stmt.close();
             }
         }
+        
+        private final static String SQL_FIND_STATE_INSTANCES_BY_WORKFLOW_ID = "select st.*  from "
+        		+ " (select * from WfTraceRecord where workflow_id = ?) tr"
+        		+ " join WfStateInstance st on st.state_id = tr.state_id"
+        		+ " order by tr.trace_seq"
+        		;
+        public List<WfStateInstance> findStateInstancesInTraceOrder(Connection conn, String workflowId) throws SQLException, InstantiationException, InvocationTargetException, IllegalAccessException {
+            PreparedStatement stmt = conn.prepareStatement(SQL_FIND_STATE_INSTANCES_BY_WORKFLOW_ID,
+            		ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            try {
+                int index = 1;
+
+                stmt.setString(index++, workflowId);
+
+                return QueryDataDao.findData(stmt, WfStateInstance.class);
+            } finally {
+                stmt.close();
+            }
+        }
 
         /**
          *
@@ -576,70 +584,173 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
          * @param workflowStatus ignored if it equals Integer.MIN_VALUE
          * @return
          */
-        public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
+        public List<WfInstance> findWorkflowInstatncesInTimeSpan(
                 Connection conn,
-                boolean isUseUpdateTime,
-                String workflowName, long startTime, long endTime,
-                int workflowStatus
-        ) throws SQLException, InstantiationException, IllegalAccessException, InvocationTargetException {
-            List<Object> params = new ArrayList<Object>();
-            StringBuilder sqlWhere = new StringBuilder();
+                long rowOffset, long rowPageSize, 
+        		String workflow_name, 
+        		String create_user, String update_user,
+        		QueryFilterOfTimeSpan filterOfTimeSpan,
+        		QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+        		long startTime, long endTime, String current_state_name
+        		) throws SQLException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            PreparedStatement stmt = statementWithSelectPartForFindWorkflowInstatncesInTimeSpan(
+            		conn, "select * from WfInstance ", false,
+    				rowOffset, rowPageSize, 
+    				workflow_name, create_user, update_user, 
+    				filterOfTimeSpan, filterOfWorkflowStatus, 
+    				startTime, endTime, 
+    				current_state_name);
 
-            //status
-            if(workflowStatus != Integer.MIN_VALUE) {
-                sqlWhere.append(" workflow_status = ?");
-                params.add(workflowStatus);
-            }
-
-            //update_time
-            if(sqlWhere.length() > 0) {
-                sqlWhere.append(" and ");
-            }
-            if(isUseUpdateTime) {
-                sqlWhere.append(" update_time >= ? and update_time < ?");
-            } else {
-                sqlWhere.append(" create_time >= ? and create_time < ?");
-            }
-
-            params.add(startTime);
-            params.add(endTime);
-
-            //name
-            if(workflowName != null || workflowName.length() > 0) {
-                sqlWhere.append(" and ");
-                sqlWhere.append(" workflow_name = ?");
-                params.add(workflowName);
-            }
-
-            String sql = "select * from WfInstance where "
-                    .concat(sqlWhere.toString())
-                    .concat(" order by update_time");
-
-
-            PreparedStatement stmt = conn.prepareStatement(sql,
-                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             try {
-                int index = 1;
-
-                for (Object param : params) {
-                    if(param.getClass() == String.class) {
-                        stmt.setString(index++, (String)param);
-                    } else if(param.getClass() == Integer.class) {
-                        stmt.setInt(index++, (Integer) param);
-                    } else if(param.getClass() == Long.class) {
-                        stmt.setLong(index++, (Long) param);
-                    } else {
-                        stmt.setObject(index++, param);
-                    }
-                }
-
                 return QueryDataDao.findData(stmt, WfInstance.class);
             } finally {
                 stmt.close();
             }
-
         }
+        
+        public long countWorkflowInstatncesInTimeSpan(
+                Connection conn,
+        		String workflow_name, 
+        		String create_user, String update_user,
+        		QueryFilterOfTimeSpan filterOfTimeSpan,
+        		QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+        		long startTime, long endTime, String current_state_name
+        		) throws SQLException {
+            PreparedStatement stmt = statementWithSelectPartForFindWorkflowInstatncesInTimeSpan(
+            		conn, "select count(1) from WfInstance ", true,
+    				0, 1, 
+    				workflow_name, create_user, update_user, 
+    				filterOfTimeSpan, filterOfWorkflowStatus, 
+    				startTime, endTime, 
+    				current_state_name);
 
+            try {
+                ResultSet rs = stmt.executeQuery();
+                if(rs.next()) {
+                	return rs.getLong(1);
+                } else {
+                	return 0;
+                }
+            } finally {
+                stmt.close();
+            }
+        }
+        
+        public PreparedStatement statementWithSelectPartForFindWorkflowInstatncesInTimeSpan(
+        		Connection conn, String sqlSelectPart,
+        		boolean isOnlyCount,
+                long rowOffset, long rowPageSize, 
+        		String workflow_name, 
+        		String create_user, String update_user,
+        		QueryFilterOfTimeSpan filterOfTimeSpan,
+        		QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+        		long startTime, long endTime, String current_state_name
+        		) throws SQLException {
+        	List<Object> params = new ArrayList<Object>();
+        	
+        	StringBuilder sqlWhere = new StringBuilder();
+            //status
+            if(filterOfWorkflowStatus != QueryFilterOfWorkflowStatus.All) {
+                sqlWhere.append(" workflow_status = ?");
+                params.add(filterOfWorkflowStatus.ordinal());
+            }
+
+            //update_time
+            if(filterOfTimeSpan == QueryFilterOfTimeSpan.UpdateTime) {
+                if(sqlWhere.length() > 0) {
+                    sqlWhere.append(" and ");
+                }
+                sqlWhere.append(" update_time >= ? and update_time < ?");
+                params.add(startTime);
+                params.add(endTime);
+            } else if(filterOfTimeSpan == QueryFilterOfTimeSpan.CreateTime) {
+                if(sqlWhere.length() > 0) {
+                    sqlWhere.append(" and ");
+                }
+                sqlWhere.append(" create_time >= ? and create_time < ?");
+                params.add(startTime);
+                params.add(endTime);
+            } else if(filterOfTimeSpan == QueryFilterOfTimeSpan.UpdateTimeOrCreateTime) {
+                if(sqlWhere.length() > 0) {
+                    sqlWhere.append(" and ");
+                }
+                sqlWhere.append("(");
+                sqlWhere.append(" (update_time >= ? and update_time < ?)");
+                sqlWhere.append(" or (create_time >= ? and create_time < ?)");
+                sqlWhere.append(")");
+
+                params.add(startTime);
+                params.add(endTime);
+                params.add(startTime);
+                params.add(endTime);
+            }
+
+
+            //name
+            if(workflow_name != null && workflow_name.length() > 0) {
+                sqlWhere.append(" and ");
+                sqlWhere.append(" workflow_name = ?");
+                params.add(workflow_name);
+            }
+            
+            //current_state_name
+            if(current_state_name != null && current_state_name.length() > 0) {
+                sqlWhere.append(" and ");
+                sqlWhere.append(" current_state_name = ?");
+                params.add(current_state_name);
+            }
+            
+            //create_user
+            if(create_user != null && create_user.length() > 0) {
+                sqlWhere.append(" and ");
+                sqlWhere.append(" create_user = ?");
+                params.add(create_user);
+            }
+            
+            //update_user
+            if(update_user != null && update_user.length() > 0) {
+                sqlWhere.append(" and ");
+                sqlWhere.append(" update_user = ?");
+                params.add(update_user);
+            }
+
+            String sql = sqlSelectPart.concat(" where ")
+                    .concat(sqlWhere.toString())
+                    ;
+            
+            if(!isOnlyCount) {
+                String sqlOrderBy;
+                if(filterOfTimeSpan == QueryFilterOfTimeSpan.UpdateTime) {
+                    sqlOrderBy = " order by update_time desc";
+                } else if(filterOfTimeSpan == QueryFilterOfTimeSpan.CreateTime) {
+                    sqlOrderBy = " order by create_time desc";
+                } else {
+                    sqlOrderBy = " order by update_time desc, create_time desc";
+                }
+                
+            	sql = sql.concat(sqlOrderBy.toString())
+            			.concat(" limit ").concat(Long.toString(rowOffset))
+            			.concat(",").concat(Long.toString(rowPageSize));
+            }
+
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            
+            int index = 1;
+            for (Object param : params) {
+                if(param.getClass() == String.class) {
+                    stmt.setString(index++, (String)param);
+                } else if(param.getClass() == Integer.class) {
+                    stmt.setInt(index++, (Integer) param);
+                } else if(param.getClass() == Long.class) {
+                    stmt.setLong(index++, (Long) param);
+                } else {
+                    stmt.setObject(index++, param);
+                }
+            }
+            
+            return stmt;
+        }
     }
 
     private final static String[] WfMeta_PKs = new String[]{

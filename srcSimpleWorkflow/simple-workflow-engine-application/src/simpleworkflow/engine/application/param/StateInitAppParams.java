@@ -1,5 +1,6 @@
 package simpleworkflow.engine.application.param;
 
+import simpleworkflow.core.interfaces.IPersistenceTransaction;
 import simpleworkflow.core.interfaces.IWorkflowEngine;
 import simpleworkflow.core.meta.State;
 import simpleworkflow.core.meta.Workflow;
@@ -9,18 +10,7 @@ import simpleworkflow.core.meta.Workflow;
  * workflowId could be null when the state is the 1st state of the workflow.
  * @author XingGu_Liu
  */
-public class StateInitAppParams {
-    private IWorkflowEngine _engine;
-
-    private String _user;
-
-    private Workflow _workflowMeta;
-
-    private String _workflowId;
-
-    private State _stateMeta;
-
-    private String _stateId;
+public class StateInitAppParams extends StateAppBaseParams {
 
     private Object _inData;
 
@@ -28,64 +18,13 @@ public class StateInitAppParams {
     }
 
     public StateInitAppParams(
-            IWorkflowEngine engine, String user,
+            IWorkflowEngine engine, IPersistenceTransaction transaction, 
+            String user,
             Workflow workflowMeta, String workflowId,
             State stateMeta, String stateId, Object inData) {
-        _engine = engine;
-        _user = user;
-        _workflowMeta = workflowMeta;
-        _workflowId = workflowId;
-        _stateMeta = stateMeta;
-        _stateId = stateId;
+    	super(engine, transaction, user, workflowMeta, workflowId, stateMeta, stateId);
+    	
         _inData = inData;
-    }
-
-    public IWorkflowEngine getEngine() {
-        return _engine;
-    }
-
-    public void setEngine(IWorkflowEngine engine) {
-        _engine = engine;
-    }
-
-    public String getUser() {
-        return _user;
-    }
-
-    public void setUser(String user) {
-        _user = user;
-    }
-
-    public Workflow getWorkflowMeta() {
-        return _workflowMeta;
-    }
-
-    public void setWorkflowMeta(Workflow workflowMeta) {
-        _workflowMeta = workflowMeta;
-    }
-
-    public String getWorkflowId() {
-        return _workflowId;
-    }
-
-    public void setWorkflowId(String workflowId) {
-        _workflowId = workflowId;
-    }
-
-    public State getStateMeta() {
-        return _stateMeta;
-    }
-
-    public void setStateMeta(State stateMeta) {
-        _stateMeta = stateMeta;
-    }
-
-    public String getStateId() {
-        return _stateId;
-    }
-
-    public void setStateId(String stateId) {
-        _stateId = stateId;
     }
 
     public Object getInData() {

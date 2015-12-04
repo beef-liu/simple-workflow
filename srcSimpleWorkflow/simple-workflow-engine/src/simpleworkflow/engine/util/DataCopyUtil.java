@@ -1,11 +1,11 @@
 package simpleworkflow.engine.util;
 
-import CollectionCommon.ITreeNode;
-import MetoXML.AbstractReflectInfoCachedSerializer;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+
+import CollectionCommon.ITreeNode;
+import MetoXML.AbstractReflectInfoCachedSerializer;
 
 /**
  * @author XingGu_Liu

@@ -1,6 +1,5 @@
 package simpleworkflow.engine.persistence.sql.data;
 
-import simpleworkflow.core.meta.State;
 
 /**
  * @author XingGu_Liu

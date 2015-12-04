@@ -1,5 +1,6 @@
 package simpleworkflow.engine.application.param;
 
+import simpleworkflow.core.interfaces.IPersistenceTransaction;
 import simpleworkflow.core.interfaces.IWorkflowEngine;
 import simpleworkflow.core.meta.State;
 import simpleworkflow.core.meta.Workflow;
@@ -16,13 +17,14 @@ public class StateRouterRuleAppParams extends StateEventAppParams {
     }
 
     public StateRouterRuleAppParams(
-            IWorkflowEngine engine, String user,
+            IWorkflowEngine engine, IPersistenceTransaction transaction, 
+            String user,
             Workflow workflowMeta, String workflowId,
             State stateMeta, String stateId, Object stateData,
             String eventName, Object eventData,
             String routerRuleName, String toState
     ) {
-        super(engine, user, workflowMeta, workflowId, stateMeta, stateId, stateData, eventName, eventData);
+        super(engine, transaction, user, workflowMeta, workflowId, stateMeta, stateId, stateData, eventName, eventData);
 
         _routerRuleName = routerRuleName;
         _toState = toState;

@@ -1,8 +1,8 @@
 package simpleworkflow.core.interfaces;
 
 import simpleworkflow.core.WorkflowEnums;
+import simpleworkflow.core.error.WorkflowPersistenceException;
 import simpleworkflow.core.meta.Workflow;
-import simpleworkflow.core.persistence.WorkflowPersistenceException;
 import simpleworkflow.core.persistence.data.WfInstance;
 import simpleworkflow.core.persistence.data.WfStateInstance;
 import simpleworkflow.core.persistence.data.WfTraceInstance;
@@ -15,6 +15,17 @@ import java.util.List;
  */
 public interface IWorkflowPersistence {
 
+    public static enum QueryFilterOfTimeSpan {
+    	UpdateTime, CreateTime, UpdateTimeOrCreateTime
+    }
+    
+    public static enum QueryFilterOfWorkflowStatus {
+        Running,
+        Terminated,
+        Completed,
+        All
+    };    
+	
     public IPersistenceTransaction createTransaction();
 
     public IWorkflowQueryService getWorkflowQueryService();
@@ -27,7 +38,6 @@ public interface IWorkflowPersistence {
      * @throws WorkflowPersistenceException
      */
     public String newDataId() throws WorkflowPersistenceException;
-
 
 
     public static interface IWorkflowQueryService {
@@ -69,48 +79,68 @@ public interface IWorkflowPersistence {
         public WfStateInstance getCurrentStateInstance(String workflowId) throws WorkflowPersistenceException;
 
         /**
-         * Find WorkflowInstances sorted by create_time in descending
-         * @param workflowName It will be ignored in finding if it is null.
-         * @param startTime results are >= start time(UTC)
-         * @param endTime results are < end time(UTC)
+         * Find all state instances in order of trace records
+         * @param workflowId
          * @return
+         * @throws WorkflowPersistenceException
          */
-        public List<WfInstance> findWorkflowInstatncesCreatedInTimeSpan(
-                String workflowName, long startTime, long endTime) throws WorkflowPersistenceException;
-
+        public List<WfStateInstance> findStateInstancesInTraceOrder(String workflowId) throws WorkflowPersistenceException;
+        
         /**
          * Find WorkflowInstances sorted by create_time in descending
          * @param workflowName It will be ignored in finding if it is null.
          * @param startTime results are >= start time(UTC)
          * @param endTime results are < end time(UTC)
-         * @param workflowStatus
          * @return
          */
-        public List<WfInstance> findWorkflowInstatncesCreatedInTimeSpan(
-                String workflowName, long startTime, long endTime,
-                WorkflowEnums.WorkflowStatus workflowStatus) throws WorkflowPersistenceException;
+        
+        /**
+         * Find WorkflowInstances. 
+         * Sorted by update_time in descending if filterOfTimeSpan is UpdateTimeOrCreateTime or UpdateTime, otherwise sorted by create_time. 
+         * @param workflow_name It will be ignored if it is null.
+         * @param create_user It will be ignored if it is null.
+         * @param update_user It will be ignored if it is null.
+         * @param filterOfTimeSpan
+         * @param filterOfWorkflowStatus
+         * @param startTime
+         * @param endTime
+         * @param current_state_name It will be ignored if it is null.
+         * @return
+         * @throws WorkflowPersistenceException
+         */
+        public List<WfInstance> findWorkflowInstatncesInTimeSpan(
+        		long rowOffset, long rowPageSize, 
+                String workflow_name,
+                String create_user, String update_user,
+                QueryFilterOfTimeSpan filterOfTimeSpan,
+                QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+                long startTime, long endTime,
+                String current_state_name
+                ) throws WorkflowPersistenceException;
 
         /**
-         * Find WorkflowInstances sorted by update_time in descending
-         * @param workflowName It will be ignored in finding if it is null.
-         * @param startTime results are >= start time(UTC)
-         * @param endTime results are < end time(UTC)
+         * Query count with logic same as findWorkflowInstatncesInTimeSpan
+         * @param rowOffset
+         * @param rowPageSize
+         * @param workflow_name
+         * @param create_user
+         * @param update_user
+         * @param filterOfTimeSpan
+         * @param filterOfWorkflowStatus
+         * @param startTime
+         * @param endTime
+         * @param current_state_name
          * @return
+         * @throws WorkflowPersistenceException
          */
-        public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
-                String workflowName, long startTime, long endTime) throws WorkflowPersistenceException;
-
-        /**
-         * Find WorkflowInstances sorted by update_time in descending
-         * @param workflowName It will be ignored in finding if it is null.
-         * @param startTime results are >= start time(UTC)
-         * @param endTime results are < end time(UTC)
-         * @param workflowStatus
-         * @return
-         */
-        public List<WfInstance> findWorkflowInstatncesUpdatedInTimeSpan(
-                String workflowName, long startTime, long endTime,
-                WorkflowEnums.WorkflowStatus workflowStatus) throws WorkflowPersistenceException;
+        public long countWorkflowInstatncesInTimeSpan(
+                String workflow_name,
+                String create_user, String update_user,
+                QueryFilterOfTimeSpan filterOfTimeSpan,
+                QueryFilterOfWorkflowStatus filterOfWorkflowStatus,
+                long startTime, long endTime,
+                String current_state_name
+                ) throws WorkflowPersistenceException;
     }
 
     public static interface IWorkflowModifyService {
