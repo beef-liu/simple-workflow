@@ -41,7 +41,18 @@ public class ApplicationLoader implements IApplicationLoader {
                 throw new IllegalArgumentException("runScheme.getAppType() is illegal:" + runScheme.getAppType());
             }
         } catch (Throwable e) {
-            throw new WorkflowException(e);
+    		Throwable error;
+    		if(e.getCause() != null) {
+    			error = e.getCause();
+    		} else {
+    			error = e;
+    		}
+    		
+    		if(WorkflowException.class.isAssignableFrom(error.getClass())) {
+    			throw (WorkflowException) error;
+    		} else {
+                throw new WorkflowException(error);
+    		}
         }
     }
 

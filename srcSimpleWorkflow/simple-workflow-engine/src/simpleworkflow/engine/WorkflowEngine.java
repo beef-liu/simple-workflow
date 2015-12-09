@@ -175,9 +175,9 @@ public class WorkflowEngine implements IWorkflowEngine {
 
         long curTime = System.currentTimeMillis();
         workflowInst.setCreate_user(user);
-        workflowInst.setUpdate_user(user);
         workflowInst.setCreate_time(curTime);
-        workflowInst.setUpdate_time(curTime);
+//        workflowInst.setUpdate_user(user);
+//        workflowInst.setUpdate_time(curTime);
 
         //parent flow
         if(!isEmpty(parentWorkflowId)) {
