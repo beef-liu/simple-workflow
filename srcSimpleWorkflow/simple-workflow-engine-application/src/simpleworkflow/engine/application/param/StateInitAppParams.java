@@ -12,6 +12,8 @@ import simpleworkflow.core.meta.Workflow;
  */
 public class StateInitAppParams extends StateAppBaseParams {
 
+	private String _fromStateId;
+	
     private Object _inData;
 
     public StateInitAppParams() {
@@ -21,13 +23,25 @@ public class StateInitAppParams extends StateAppBaseParams {
             IWorkflowEngine engine, IPersistenceTransaction transaction, 
             String user,
             Workflow workflowMeta, String workflowId,
-            State stateMeta, String stateId, Object inData) {
+            State stateMeta, String stateId,
+            String fromStateId,
+            Object inData) {
     	super(engine, transaction, user, workflowMeta, workflowId, stateMeta, stateId);
     	
+    	_fromStateId = fromStateId;
         _inData = inData;
     }
+    
 
-    public Object getInData() {
+	public String getFromStateId() {
+		return _fromStateId;
+	}
+
+	public void setFromStateId(String fromStateId) {
+		_fromStateId = fromStateId;
+	}
+
+	public Object getInData() {
         return _inData;
     }
 

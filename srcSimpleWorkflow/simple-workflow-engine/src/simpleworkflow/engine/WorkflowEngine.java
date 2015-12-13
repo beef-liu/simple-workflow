@@ -190,7 +190,9 @@ public class WorkflowEngine implements IWorkflowEngine {
         InitedStateInstance initedStateInst = initStateInstance(
         		trans,
                 user, workflowMeta, workflowInst.getWorkflow_id(),
-                startStateMeta, inData
+                startStateMeta,
+                inData,
+                parentWorkflowStateId
                 );
     	
         //===>save instance of workFlow and state
@@ -376,7 +378,10 @@ public class WorkflowEngine implements IWorkflowEngine {
         InitedStateInstance nextStateInst = initStateInstance(
         		trans,
                 user, workflowMeta, workflowInst.getWorkflow_id(),
-                nextStateMeta, stateData);
+                nextStateMeta, 
+                stateData,
+                stateInst.getState_id()
+                );
 
         stateInst.setTo_state_name(nextStateName);
         stateInst.setTo_state_id(nextStateInst.stateInstance.getState_id());
@@ -524,12 +529,16 @@ public class WorkflowEngine implements IWorkflowEngine {
     		IPersistenceTransaction transaction,
             String user,
             Workflow workflowMeta, String workflowId,
-            State stateMeta, Object inData
+            State stateMeta, Object inData,
+            String fromStateId
     ) throws WorkflowException, IOException, IntrospectionException, IllegalAccessException, InvocationTargetException {
         //check state access authority
         checkStateAccessAuthorization(
         		transaction,
-                user, workflowMeta, workflowId, stateMeta, null, inData);
+                user, workflowMeta, workflowId, 
+                stateMeta, null,
+                fromStateId,
+                inData);
 
         WfStateInstance state = new WfStateInstance();
 
@@ -556,7 +565,9 @@ public class WorkflowEngine implements IWorkflowEngine {
         	Object stateData = executeApplicationOfStateInit(
         			transaction,
                     user, workflowMeta, workflowId,
-                    stateMeta, state.getState_id(), inData,
+                    stateMeta, state.getState_id(),
+                    fromStateId,
+                    inData,
                     stateMeta.getInitApp());
 
             state.setState_data(_xmlSerForStateData.objToXml(stateData));
@@ -573,13 +584,18 @@ public class WorkflowEngine implements IWorkflowEngine {
     		IPersistenceTransaction transaction,
             String user,
             Workflow workflowMeta, String workflowId,
-            State stateMeta, String stateId, Object inData
+            State stateMeta, String stateId, 
+            String fromStateId,
+            Object inData
     ) throws WorkflowException {
         if(stateMeta.getAccessibleCheck() != null
                 && !isEmpty(stateMeta.getAccessibleCheck().getRun_scheme())) {
             Boolean accessible = (Boolean) executeApplicationOfStateAuthCheck(
             		transaction,
-                    user, workflowMeta, workflowId, stateMeta, stateId, inData,
+                    user, workflowMeta, workflowId, 
+                    stateMeta, stateId,
+                    fromStateId,
+                    inData,
                     stateMeta.getAccessibleCheck()
             );
             if(!accessible) {
@@ -615,14 +631,18 @@ public class WorkflowEngine implements IWorkflowEngine {
     		IPersistenceTransaction transaction,
             String user,
             Workflow workflowMeta, String workflowId,
-            State stateMeta, String stateId, Object inData,
+            State stateMeta, String stateId, 
+            String fromStateId,
+            Object inData,
             Application application
     ) throws WorkflowException {
         final StateInitAppParams appParams = new StateInitAppParams(
                 this, transaction, 
                 user,
                 workflowMeta, workflowId,
-                stateMeta, stateId, inData
+                stateMeta, stateId,
+                fromStateId,
+                inData
         );
         return (Boolean) _applicationLoader.executeApplication(application, appParams);
     }
@@ -649,14 +669,18 @@ public class WorkflowEngine implements IWorkflowEngine {
     		IPersistenceTransaction transaction,
             String user,
             Workflow workflowMeta, String workflowId,
-            State stateMeta, String stateId, Object inData,
+            State stateMeta, String stateId, 
+            String fromStateId,
+            Object inData,
             Application application
     ) throws WorkflowException {
         final StateInitAppParams appParams = new StateInitAppParams(
                 this, transaction, 
                 user,
                 workflowMeta, workflowId,
-                stateMeta, stateId, inData
+                stateMeta, stateId,
+                fromStateId,
+                inData
         );
         return _applicationLoader.executeApplication(application, appParams);
     }
