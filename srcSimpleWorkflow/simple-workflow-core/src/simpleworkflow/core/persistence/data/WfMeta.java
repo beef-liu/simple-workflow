@@ -1,4 +1,4 @@
-package simpleworkflow.engine.persistence.sql.data;
+package simpleworkflow.core.persistence.data;
 
 
 /**

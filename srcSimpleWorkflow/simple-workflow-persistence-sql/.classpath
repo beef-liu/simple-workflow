@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/SalamaCloudDataServiceUtil.jar"/>
 	<classpathentry kind="lib" path="lib/SalamaUtil.jar"/>
 	<classpathentry kind="lib" path="lib/simple-workflow-core.jar"/>
+	<classpathentry kind="lib" path="lib/simple-workflow-persistence-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

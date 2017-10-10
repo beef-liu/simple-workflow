@@ -66,6 +66,12 @@
 		depends="createBinTmp,copyClass,copySrc,deleteJUnitClass,deleteVssFile,deleteSVN"> 
 		<jar jarfile="${jar.name}" basedir="${bintemp.dir}" />
 		<delete dir="${bintemp.dir}"></delete>
+        <copy todir="../simple-workflow-abstract-engine/lib/">
+            <fileset file="${jar.name}"></fileset>
+        </copy>
+        <copy todir="../simple-workflow-engine/lib/">
+            <fileset file="${jar.name}"></fileset>
+        </copy>
 	</target>
 	
 </project>

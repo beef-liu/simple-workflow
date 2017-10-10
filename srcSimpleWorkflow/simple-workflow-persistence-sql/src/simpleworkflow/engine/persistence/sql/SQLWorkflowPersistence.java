@@ -23,13 +23,14 @@ import simpleworkflow.core.interfaces.IPersistenceTransaction;
 import simpleworkflow.core.interfaces.IWorkflowPersistence;
 import simpleworkflow.core.meta.Workflow;
 import simpleworkflow.core.persistence.data.WfInstance;
+import simpleworkflow.core.persistence.data.WfMeta;
 import simpleworkflow.core.persistence.data.WfStateInstance;
 import simpleworkflow.core.persistence.data.WfTraceInstance;
 import simpleworkflow.core.persistence.data.WfTraceRecord;
-import simpleworkflow.engine.persistence.sql.data.WfMeta;
-import simpleworkflow.engine.persistence.sql.util.HexUtil;
 import simpleworkflow.engine.persistence.sql.util.SQLPersistenceTransaction;
-import simpleworkflow.engine.persistence.sql.util.WfMetaUtil;
+import simpleworkflow.engine.persistence.util.DataIdGenerator;
+import simpleworkflow.engine.persistence.util.HexUtil;
+import simpleworkflow.engine.persistence.util.WfMetaUtil;
 import MetoXML.Base.XmlParseException;
 import MetoXML.Util.ClassFinder;
 
@@ -43,9 +44,7 @@ import com.salama.util.db.JDBCUtil;
 public class SQLWorkflowPersistence implements IWorkflowPersistence {
 	private final static Logger logger = Logger.getLogger(SQLWorkflowPersistence.class);
 
-    private final byte _serverNum;
-    private final Random _rand;
-    private final AtomicInteger _seq;
+	private final DataIdGenerator _dataIdGenerator;
 
     private final IDBSource _dbSource;
     private ClassFinder _classFinderForWorkflowCoreData;
@@ -67,10 +66,7 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
             IDBSource dbSource,
             IClassFinder classFinderForWorkflowCoreData
             ) {
-        _serverNum = serverNum;
-        _rand = new Random(System.currentTimeMillis());
-        _seq = new AtomicInteger(Integer.MIN_VALUE);
-
+        _dataIdGenerator = new DataIdGenerator(serverNum);
         _dbSource = dbSource;
 
         {
@@ -118,24 +114,7 @@ public class SQLWorkflowPersistence implements IWorkflowPersistence {
 
     @Override
     public String newDataId() throws WorkflowPersistenceException {
-        final ByteBuffer buffer = ByteBuffer.allocate(16);
-        buffer.clear();
-
-        buffer.order(ByteOrder.BIG_ENDIAN);
-
-        //UTC(8 byte) ----->
-        buffer.putLong(System.currentTimeMillis());
-
-        //4 byte ----->
-        int randNum = (_rand.nextInt() & 0x00ffffff)
-                | ( (_serverNum) << 24);
-        buffer.putInt(randNum);
-
-        //4 byte ----->
-        buffer.putInt(_seq.incrementAndGet());
-
-
-        return HexUtil.toHexString(buffer.array(), 0, 16);
+        return _dataIdGenerator.newDataId();
     }
 
     private class WorkflowQueryService implements IWorkflowQueryService {

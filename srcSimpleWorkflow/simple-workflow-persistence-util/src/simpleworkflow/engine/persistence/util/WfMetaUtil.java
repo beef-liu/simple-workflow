@@ -1,4 +1,4 @@
-package simpleworkflow.engine.persistence.sql.util;
+package simpleworkflow.engine.persistence.util;
 
 import java.beans.IntrospectionException;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.util.List;
 
 import simpleworkflow.core.meta.State;
 import simpleworkflow.core.meta.Workflow;
-import simpleworkflow.engine.persistence.sql.data.WfMeta;
+import simpleworkflow.core.persistence.data.WfMeta;
 import MetoXML.XmlDeserializer;
 import MetoXML.XmlSerializer;
 import MetoXML.Base.XmlParseException;
@@ -19,6 +19,7 @@ import MetoXML.Util.ClassFinder;
  */
 public class WfMetaUtil {
 
+    @SuppressWarnings("unchecked")
     public static Workflow toWorkflow(WfMeta wfMeta, ClassFinder classFinder)
             throws IllegalAccessException, IOException, XmlParseException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         if(wfMeta == null) {
