@@ -9,13 +9,50 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author XingGu_Liu
- */
 public class DataCopyUtil {
     private final static Map<String, Map<String, PropertyDescriptor>> _cache = new ConcurrentHashMap<String, Map<String, PropertyDescriptor>>();
 
+    /**
+     *
+     * @param srcData could be Map<String, Object>
+     * @param destData could be Map<String, Object>
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IntrospectionException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
     public static void copyData(Object srcData, Object destData) throws InstantiationException, IllegalAccessException, IntrospectionException, IllegalArgumentException, InvocationTargetException {
+        if(Map.class.isAssignableFrom(srcData.getClass())) {
+            if(Map.class.isAssignableFrom(destData.getClass())) {
+                //map to map
+                ((Map<String, Object>) destData).putAll(((Map<String, Object>) srcData));
+            } else {
+                //map to bean
+                copyDataWithMapToBean((Map<String, Object>) srcData, destData);
+            }
+        } else {
+            if(Map.class.isAssignableFrom(destData.getClass())) {
+                //bean to map
+                copyDataWithBeanToMap(srcData, (Map<String, Object>) destData);
+            } else {
+                //bean to bean
+                copyDataWithBeanToBean(srcData, destData);
+            }
+        }
+    }
+
+    public static Map<String, Object> beanToMap(Object data) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        if(data == null) return null;
+
+        Map<String, Object> kvMap = new HashMap<String, Object>();
+
+        copyDataWithBeanToMap(data, kvMap);
+
+        return kvMap;
+    }
+
+    private static void copyDataWithBeanToBean(Object srcData, Object destData) throws InstantiationException, IllegalAccessException, IntrospectionException, IllegalArgumentException, InvocationTargetException {
         Map<String, PropertyDescriptor> srcPropMap = getPropertyDescriptorMap(srcData.getClass());
         Map<String, PropertyDescriptor> destPropMap = getPropertyDescriptorMap(destData.getClass());
         for(Map.Entry<String, PropertyDescriptor> srcPdEntry : srcPropMap.entrySet()) {
@@ -41,6 +78,51 @@ public class DataCopyUtil {
                     destData,
                     srcReadMethod.invoke(srcData, (Object[]) null)
             );
+        }
+    }
+
+    private static void copyDataWithMapToBean(Map<String, Object> srcData, Object destData) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        Map<String, PropertyDescriptor> destPropMap = getPropertyDescriptorMap(destData.getClass());
+        for(Map.Entry<String, Object> entry : srcData.entrySet()) {
+            final String key = entry.getKey();
+            final Object val = entry.getValue();
+
+            final PropertyDescriptor destPd = destPropMap.get(key);
+            if(destPd == null) {
+                continue;
+            }
+
+            final Method destWriteMethod = destPd.getWriteMethod();
+            if(destWriteMethod == null) {
+                continue;
+            }
+
+            destWriteMethod.invoke(destData, val);
+        }
+    }
+
+    private static void copyDataWithBeanToMap(Object srcData, Map<String, Object> destData) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        Class<?> dataCls = srcData.getClass();
+
+        if(Map.class.isAssignableFrom(dataCls)) {
+            destData.putAll((Map<String, Object>) srcData);
+            return;
+        }
+
+        Map<String, PropertyDescriptor> srcPropMap = getPropertyDescriptorMap(dataCls);
+        for(Map.Entry<String, PropertyDescriptor> srcPdEntry : srcPropMap.entrySet()) {
+            final String propName = srcPdEntry.getKey();
+            final PropertyDescriptor srcPd = srcPdEntry.getValue();
+            final Method srcReadMethod = srcPd.getReadMethod();
+
+            if(srcReadMethod == null) {
+                continue;
+            }
+
+            final Object val = srcReadMethod.invoke(srcData, (Object[]) null);
+            if(val != null) {
+                destData.put(propName, val);
+            }
         }
     }
 
