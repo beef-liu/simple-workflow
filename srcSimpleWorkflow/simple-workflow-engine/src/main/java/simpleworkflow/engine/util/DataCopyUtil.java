@@ -5,7 +5,9 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,14 +44,35 @@ public class DataCopyUtil {
         }
     }
 
-    public static Map<String, Object> beanToMap(Object data) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
-        if(data == null) return null;
+    /**
+     *
+     * @param srcData could be Map<String, Object>
+     * @param destDataClass could be HashMap.class
+     * @param <T>
+     * @return
+     * @throws InvocationTargetException
+     * @throws IntrospectionException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    public static <T> T createAndCopyData(Object srcData, Class<T> destDataClass) throws InvocationTargetException, IntrospectionException, InstantiationException, IllegalAccessException {
+        T destData = destDataClass.newInstance();
 
-        Map<String, Object> kvMap = new HashMap<String, Object>();
+        copyData(srcData, destData);
 
-        copyDataWithBeanToMap(data, kvMap);
+        return destData;
+    }
 
-        return kvMap;
+    public static <T> List<T> createAndCopyDataList(List<?> srcDataList, Class<T> destDataClass) throws IntrospectionException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        List<T> destDataList = srcDataList.getClass().newInstance();
+
+        for(Object srcData : srcDataList) {
+            T destData = createAndCopyData(srcData, destDataClass);
+
+            destDataList.add(destData);
+        }
+
+        return destDataList;
     }
 
     private static void copyDataWithBeanToBean(Object srcData, Object destData) throws InstantiationException, IllegalAccessException, IntrospectionException, IllegalArgumentException, InvocationTargetException {
