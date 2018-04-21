@@ -83,7 +83,7 @@ public class DataCopyUtil {
             final PropertyDescriptor srcPd = srcPdEntry.getValue();
             final Method srcReadMethod = srcPd.getReadMethod();
 
-            if(srcReadMethod == null) {
+            if(srcReadMethod == null || srcPd.getWriteMethod() == null) {
                 continue;
             }
 
@@ -138,7 +138,7 @@ public class DataCopyUtil {
             final PropertyDescriptor srcPd = srcPdEntry.getValue();
             final Method srcReadMethod = srcPd.getReadMethod();
 
-            if(srcReadMethod == null) {
+            if(srcReadMethod == null || srcPd.getWriteMethod() == null) {
                 continue;
             }
 
